@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">nearlikes</string>
+    <string name="facebook_app_id">489643832117895</string>
+    <string name="fb_login_protocol_scheme">fb489643832117895</string>
+</resources>
