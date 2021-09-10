@@ -13,14 +13,14 @@ class GetMedia {
     this.media,
   });
 
-  List<Media> media;
+  List<Media>? media;
 
   factory GetMedia.fromJson(Map<String, dynamic> json) => GetMedia(
     media: List<Media>.from(json["media"].map((x) => Media.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
-    "media": List<dynamic>.from(media.map((x) => x.toJson())),
+    "media": List<dynamic>.from(media!.map((x) => x.toJson())),
   };
 }
 
@@ -32,10 +32,10 @@ class Media {
     this.type,
   });
 
-  String id;
-  String src;
-  String pre;
-  String type;
+  String? id;
+  String? src;
+  String? pre;
+  String? type;
 
   factory Media.fromJson(Map<String, dynamic> json) => Media(
     id: json["_id"],

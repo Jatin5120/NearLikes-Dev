@@ -10,8 +10,8 @@ class GetStry {
     this.paging,
   });
 
-  List<Datum> data;
-  Paging paging;
+  List<Datum>? data;
+  Paging? paging;
 
   factory GetStry.fromJson(Map<String, dynamic> json) => GetStry(
     data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
@@ -19,8 +19,8 @@ class GetStry {
   );
 
   Map<String, dynamic> toJson() => {
-    "data": List<dynamic>.from(data.map((x) => x.toJson())),
-    "paging": paging.toJson(),
+    "data": List<dynamic>.from(data!.map((x) => x.toJson())),
+    "paging": paging!.toJson(),
   };
 }
 
@@ -32,10 +32,10 @@ class Datum {
     this.id,
   });
 
-  String mediaUrl;
-  String timestamp;
-  String caption;
-  String id;
+  String? mediaUrl;
+  String? timestamp;
+  String? caption;
+  String? id;
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
     mediaUrl: json["media_url"],
@@ -57,14 +57,14 @@ class Paging {
     this.cursors,
   });
 
-  Cursors cursors;
+  Cursors? cursors;
 
   factory Paging.fromJson(Map<String, dynamic> json) => Paging(
     cursors: Cursors.fromJson(json["cursors"]),
   );
 
   Map<String, dynamic> toJson() => {
-    "cursors": cursors.toJson(),
+    "cursors": cursors!.toJson(),
   };
 }
 
@@ -74,8 +74,8 @@ class Cursors {
     this.after,
   });
 
-  String before;
-  String after;
+  String? before;
+  String? after;
 
   factory Cursors.fromJson(Map<String, dynamic> json) => Cursors(
     before: json["before"],

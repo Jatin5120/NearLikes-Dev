@@ -1,464 +1,240 @@
-import 'dart:math';
+// ignore_for_file: avoid_print
+
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nearlikes/Coupons.dart';
-import 'package:nearlikes/LinkBank.dart';
-import 'package:nearlikes/about_page.dart';
-import 'package:nearlikes/brand_stories.dart';
-import 'package:nearlikes/faq.dart';
-import 'package:nearlikes/help_page.dart';
-import 'package:nearlikes/history_page.dart';
-import 'package:nearlikes/login.dart';
-import 'package:nearlikes/scratch_cards.dart';
-import 'package:nearlikes/select_brand.dart';
-import 'link_UPI.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'models/get_campaigns.dart';
-import 'dart:convert';
-import 'dart:async';
-import 'package:nearlikes/models/get_customer.dart';
-import 'theme.dart';
+import 'package:nearlikes/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Customer _getCustomer;
-String CID;
+import '../about_page.dart';
+import '../faq.dart';
+import '../help_page.dart';
+import '../login.dart';
+import '../models/get_customer.dart';
+import '../scratch_cards.dart';
+import 'constants/constants.dart';
+import 'coupon.dart';
+import 'link_upi_id.dart';
 
-String name='';
-String phonenumber;
 class ProfilePage extends StatefulWidget {
-  final phoneNumber;
-  ProfilePage({this.phoneNumber});
+  final String? phoneNumber;
+  const ProfilePage({Key? key, this.phoneNumber}) : super(key: key);
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
-
-// void get()async{
-//   await getCustomer();
-// }
-
 class _ProfilePageState extends State<ProfilePage> {
-  int sum=0;
+  int sum = 0;
 
-  // Future<Customer> getCustomer(String customerId) async {
-  //   print(".....");
-  //   final String apiUrl = "https://nearlikes.com/v1/api/client/own/fetch";
-  //   var body = {
-  //     "id" : "$customerId"
-  //   };
-  //   final response = await http.post(
-  //     Uri.parse(apiUrl),
-  //     headers: {"Content-Type": "application/json"},
-  //     body: json.encode(body),
-  //   );
-  //
-  //   print(".....");
-  //   print(response.statusCode);
-  //   final String responseString = response.body.toString();
-  //
-  //   print(responseString);
-  //   _getCustomer = customerFromJson(responseString);
-  //   for(int i=0;i<_getCustomer.customer.cashback.length;i++)
-  //   {
-  //     if(_getCustomer.customer.cashback[i].used)
-  //     {
-  //       print(_getCustomer.customer.cashback[i].amount);
-  //       var a = int.parse(_getCustomer.customer.cashback[i].amount);
-  //       assert(a is int);
-  //
-  //       sum = sum + a;
-  //     }
-  //   }
-  //   print(";;;");
-  //   print(sum);
-  //   print(_getCustomer.customer.name);
-  //   setState(() {
-  //     name=_getCustomer.customer.name;
-  //   });
-  //   return _getCustomer;
-  // }
+  Customer? _getCustomer;
+  String? cID;
 
-  Future<Customer> getCustomer(String customerId) async {
-    print(".....");
-    final String apiUrl = "https://nearlikes.com/v1/api/client/own/fetch";
-    var body = {
-      "id" : "$customerId"
-    };
-    final response = await http.post(
+  String? name = '';
+  String? phonenumber;
+  String? customerId;
+
+  late List<Map<String, dynamic>> _profileListItems;
+
+  Future<Customer?> getCustomer(String? customerId) async {
+    const String apiUrl = "https://nearlikes.com/v1/api/client/own/fetch";
+    Map<String, String> body = {"id": "$customerId"};
+    final http.Response response = await http.post(
       Uri.parse(apiUrl),
       headers: {"Content-Type": "application/json"},
       body: json.encode(body),
     );
 
-    print(".....");
-    print(response.statusCode);
-    final String responseString = response.body.toString();
+    print("StatusCode --> ${response.statusCode}");
+    final String responseString = response.body;
 
     print(responseString);
     _getCustomer = customerFromJson(responseString);
-    // for(int i=0;i<_getCustomer.customer.cashback.length;i++)
-    //   {
-    //     print(_getCustomer.customer.cashback[i].amount);
-    //   var a=int.parse(_getCustomer.customer.cashback[i].amount);
-    //   assert(a is int);
-    //
-    //   sum=sum + a;
-    //   }
-    for(int i=0;i<_getCustomer.customer.cashback.length;i++)
-    {
-      if(_getCustomer.customer.cashback[i].used==true){
-        var a=int.parse(_getCustomer.customer.cashback[i].amount);
+
+    for (int i = 0; i < _getCustomer!.customer!.cashback!.length; i++) {
+      if (_getCustomer!.customer!.cashback![i].used == true) {
+        var a = int.parse(_getCustomer!.customer!.cashback![i].amount!);
         assert(a is int);
 
-        sum=sum + a;
+        sum = sum + a;
       }
-
     }
-    print(";;;");
+
     print(sum);
-    print(_getCustomer.customer.name);
+    print("Name --> ${_getCustomer!.customer!.name}");
     setState(() {
-      name=_getCustomer.customer.name;
-      CID=_getCustomer.customer.id;
+      name = _getCustomer!.customer!.name;
+      cID = _getCustomer!.customer!.id;
     });
     return _getCustomer;
   }
 
-  deleteAcc()async {
-
-     print('the phone number is $phonenumber');
+  Future<void> deleteAcc() async {
+    print('Phone number --> $phonenumber');
     // var body = {
     //   "phone": "+91${phonenumber}"
     // };
-    var body = {
-      "phone" : "+91$phonenumber"
-    };
-    final response1 = await http.post(
+    final Map<String, String> body = {"phone": "+91$phonenumber"};
+    final http.Response response = await http.post(
       Uri.parse('https://nearlikes.com/v1/api/client/delete'),
       headers: {"Content-Type": "application/json"},
       body: json.encode(body),
     );
-    print(response1.statusCode);
-    print('/////////');
-    print(response1.body);
+    print("StatusCode --> ${response.statusCode}");
+    print(response.body);
   }
-  getCustomerId(String phonenumber)async{
-    var body = {
-      "phone" : "+91$phonenumber"
-    };
-    // var body = {
-    //   "phone" : "+919840746712"
-    // };
-    final response = await http.post(
-      Uri.parse('https://nearlikes.com/v1/api/client/getid'),
-      headers: {"Content-Type": "application/json"},
-      body: json.encode(body),
-    );
-    var test=jsonDecode(response.body);
-    print('the response is ${test}');
-    getCustomer(test);
+
+  Future<void> getCustomerId(String? phonenumber) async {
+    final Map<String, String> body = {"phone": "+91$phonenumber"};
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://nearlikes.com/v1/api/client/getid'),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(body),
+      );
+      var test = jsonDecode(response.body);
+      print('the response is $test');
+      getCustomer(test);
+    } catch (e) {
+      print("Error--> $e");
+    }
   }
-String customerId;
-  getUserData()async{
+
+  Future<void> getUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      customerId= prefs.getString('customer_id');
-      phonenumber=prefs.getString('phonenumber');
+      customerId = prefs.getString('customer_id');
+      phonenumber = prefs.getString('phonenumber');
     });
-    print('the phone number is $phonenumber');
-    print('user acc id is $customerId');
-    if(customerId==null){
-      print('test');
+    print('Phone number --> $phonenumber');
+    print('Customer id --> $customerId');
+    if (customerId == null) {
       getCustomerId(phonenumber);
+    } else {
+      getCustomer(customerId);
     }
-    else getCustomer(customerId);
   }
 
   @override
   void initState() {
-    //get();
-    getUserData();
     super.initState();
+    //get();
+    _profileListItems = [
+      {'title': 'Cash Rewards', 'screen': ScratchCards(cID: cID)},
+      {'title': 'Coupons', 'screen': Coupons(cID: cID)},
+      {
+        'title': 'Link UPI ID',
+        'screen': LinkUPI(phoneNumber: widget.phoneNumber)
+      },
+      {'title': 'About', 'screen': const About()},
+      {'title': 'FAQ', 'screen': const FAQ()},
+      {
+        'title': 'Help',
+        'screen': const Help(),
+      },
+      {'title': 'LogOut', 'screen': const Login(), 'isLast': true}
+    ];
+    getUserData();
   }
+
   @override
   Widget build(BuildContext context) {
-    return
-      Scaffold(
-        body: SingleChildScrollView(
+    final Size size = MediaQuery.of(context).size;
+    return Scaffold(
+      body: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        child: SizedBox(
+          height: size.height.ninetyFivePercent,
           child: Padding(
-            padding: const EdgeInsets.only(top:70,left: 34,right: 34),
-            child: Container(
+            padding: EdgeInsets.symmetric(
+                    horizontal: size.width.sevenPointFivePercent,
+                    vertical: size.height.sevenPointFivePercent)
+                .copyWith(bottom: 0),
+            child: SizedBox(
               width: double.infinity,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(name,
-                      style: GoogleFonts.montserrat(
-                    fontSize: 29,
-                    fontWeight: FontWeight.w700,
-                    color: kBlack,
-                  )),
-                  Container(
-                    height: 200,
-                    width: double.infinity,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          top:70,
-                          left:MediaQuery.of(context).size.width*0.178,
-                          child: Container(
-                            height: 117,
-                            width: 186,
-                            decoration: BoxDecoration(
-                                color: Color(0xfff2f2f2),
-                                borderRadius: BorderRadius.all(Radius.circular(8))
-                            ),
-                            child: Column(
+                  Text(
+                    name!,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 29,
+                      fontWeight: FontWeight.w700,
+                      color: kTextColor[700],
+                    ),
+                  ),
+                  SizedBox(height: size.height.fivePercent),
+                  RewardCard(sum: sum),
+                  // Spacer(),
+                  SizedBox(
+                    height: size.height.fiftyPercent,
+                    child: ListView.separated(
+                      itemCount: _profileListItems.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        Map<String, dynamic> item = _profileListItems[index];
+                        return InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            if (item['isLast'] != null) {
+                              SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.clear();
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Login(),
+                                ),
+                              );
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => item['screen'],
+                                ),
+                              );
+                            }
+                          },
+                          child: SizedBox(
+                            height: size.height.fivePercent,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                SizedBox(height: 45,),
-                                Text('TOTAL REWARDS',style: GoogleFonts.montserrat(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w300,
-                                  color: Color(0xffB9B9B9),
-                                )),
-                                SizedBox(height: 8,),
-                                Text("Rs. $sum",
-                                    style: GoogleFonts.montserrat(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w600,
-                                  color: kBlack,
-                                )),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top:30,
-                          left:MediaQuery.of(context).size.width*0.325,
-                          child: Container(
-                            height: 72,
-                            width: 72,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape:BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  offset: const Offset(
-                                    4, 8,
+                                Text(
+                                  item['title'],
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: item['isLast'] != null
+                                        ? kPrimaryColor
+                                        : kTextColor[700],
                                   ),
-                                  blurRadius: 20.0,
-                                  spreadRadius: 0,
-                                ), //BoxShadow//BoxShadow
+                                ),
+                                Icon(
+                                  item['isLast'] != null
+                                      ? Icons.logout_outlined
+                                      : Icons.arrow_forward_rounded,
+                                  color: kSecondaryColor,
+                                ),
                               ],
                             ),
-                            child:  Padding(
-                              padding: const EdgeInsets.all(15),
-                              child: Image.asset('assets/logo.png',width:32.48,height:42.28),
-                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 50,),
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => ScratchCards(cID: CID,)));
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Cash Rewards',style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: kBlack,
-                        )),
-                        Icon(Icons.arrow_forward,color: kPrimaryOrange,)
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Divider(color: Color(0xffDDDDDD)),
-                  ),
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => Coupons(cID:CID,)));
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Coupons',style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: kBlack,
-                        )),
-                        Icon(Icons.arrow_forward,color: kPrimaryOrange,)
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Divider(color: Color(0xffDDDDDD)),
-                  ),
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => LinkUPI(phoneNumber:widget.phoneNumber)));
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Link UPI ID',style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: kBlack,
-                        )),
-                        Icon(Icons.arrow_forward,color: kPrimaryOrange,)
-                      ],
-                    ),
-                  ),
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(vertical: 15),
-                  //   child: Divider(color: Color(0xffDDDDDD)),
-                  // ),
-                  // GestureDetector(
-                  //   onTap: (){
-                  //     //Navigator.push(context, MaterialPageRoute(builder: (context) => HistoryPage()));
-                  //   },
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //       Text('History',style: GoogleFonts.montserrat(
-                  //         fontSize: 16,
-                  //         fontWeight: FontWeight.w500,
-                  //         color: kBlack,
-                  //       )),
-                  //       Icon(Icons.arrow_forward,color: kPrimaryOrange,)
-                  //     ],
-                  //   ),
-                  // ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Divider(color: Color(0xffDDDDDD)),
-                  ),
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => About()));
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('About',style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: kBlack,
-                        )),
-                        Icon(Icons.arrow_forward,color: kPrimaryOrange,)
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Divider(color: Color(0xffDDDDDD)),
-                  ),
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => FAQ()));
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('FAQ',style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: kBlack,
-                        )),
-                        Icon(Icons.arrow_forward,color: kPrimaryOrange,)
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Divider(color: Color(0xffDDDDDD)),
-                  ),
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => Help()));
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Help',style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: kBlack,
-                        )),
-                        Icon(Icons.arrow_forward,color: kPrimaryOrange,)
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Divider(color: Color(0xffDDDDDD)),
-                  ),
-                  GestureDetector(
-                    onTap: ()async {
-                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                     await  prefs.clear();
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Login()));
+                        );
                       },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: Text('Logout',style: GoogleFonts.montserrat(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: kPrimaryOrange,
-                          )),
-                        ),
-
-                      ],
+                      separatorBuilder: (_, index) => Divider(),
                     ),
-                  ),
-                 // Divider(color: Colors.black26,thickness: 1,),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 0),
-                    child: Divider(color: Color(0xffDDDDDD)),
-                  ),
-                  // GestureDetector(
-                  //   onTap: ()async {
-                  //     await deleteAcc();
-                  //     SharedPreferences prefs = await SharedPreferences.getInstance();
-                  //     prefs.clear();
-                  //
-                  //    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Login()));
-                  //   },
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: [
-                  //       Center(
-                  //         child: Text('Delete My Account',style: GoogleFonts.montserrat(
-                  //           fontSize: 16,
-                  //           fontWeight: FontWeight.w500,
-                  //           color: kPrimaryOrange,
-                  //         )),
-                  //       ),
-                  //
-                  //     ],
-                  //   ),
-                  // ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child: Divider(color: Colors.white),
                   ),
                 ],
               ),
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }

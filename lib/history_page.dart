@@ -2,10 +2,10 @@
 //
 // import 'package:flutter/cupertino.dart';
 // import 'package:flutter/material.dart';
-// import 'package:nearlikes/LinkBank.dart';
-// import 'package:nearlikes/page_guide.dart';
-// import 'package:nearlikes/scratch_cards.dart';
-// import 'package:nearlikes/select_brand.dart';
+// import '../LinkBank.dart';
+// import '../page_guide.dart';
+// import '../scratch_cards.dart';
+// import '../select_brand.dart';
 // import 'theme.dart';
 // import 'package:google_fonts/google_fonts.dart';
 // class HistoryPage extends StatefulWidget {

@@ -1,107 +1,129 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:nearlikes/account_setup.dart';
-import 'package:nearlikes/otp_verification.dart';
-import 'theme.dart';
+import 'package:nearlikes/constants/constants.dart';
+import 'package:nearlikes/services/services.dart';
+import 'package:nearlikes/widgets/widgets.dart';
 
-class Help extends StatefulWidget {
+class Help extends StatelessWidget {
+  const Help({Key? key}) : super(key: key);
 
-  @override
-  _HelpState createState() => _HelpState();
-}
+  static List<Map<String, dynamic>> _contactItems = [
+    {
+      'icon': Icon(Icons.mail_outline, color: kPrimaryColor),
+      'title': 'Email',
+      'contact': 'support@nearlikes.com',
+      'onTap': () => UrlLauncher.openMail(),
+    },
+    {
+      'icon': Icon(Icons.phone_rounded, color: kPrimaryColor),
+      'title': 'Phone',
+      'contact': '+91 9392708293',
+      'onTap': () => UrlLauncher.openCall(),
+    },
+    {
+      'icon': SvgPicture.asset('assets/whatsapp.svg',
+          color: kPrimaryColor, height: 24),
+      'title': 'Message',
+      'contact': '+91 9392708293',
+      'onTap': () => UrlLauncher.openWhatsapp(),
+    },
+  ];
 
-class _HelpState extends State<Help> {
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal:40,vertical: 90),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                    onTap: (){
-                      Navigator.pop(context);
-                    },
-                    child: Icon(Icons.arrow_back,color: kPrimaryOrange,size: 30,)),
-              ),
-
-
-              SizedBox(height: 92,),
-              Image.asset('assets/logo.png',width:46.31,height:60.28),
-              SizedBox(height: 35,),
-              Center(
-                child: Text("HELP",style: GoogleFonts.montserrat(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: kFontColor,
-                ),),
-              ),
-              SizedBox(height: 20,),
-              Center(
-                child: Text('We are happy to help you. \nFeel free to contact.',textAlign:TextAlign.center,style: GoogleFonts.montserrat(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: kFontColor,
-                ),),
-              ),
-
-              SizedBox(height: 30,),
-              Icon(Icons.mail_outline,color: kPrimaryOrange,),
-              SizedBox(height: 13,),
-              Text('''Email''',textAlign:TextAlign.start,style: GoogleFonts.montserrat(
-                fontSize: 15,
+      body: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: size.width.tenPercent,
+          vertical: size.height.sevenPointFivePercent,
+        ).copyWith(bottom: size.height.fivePercent),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            MyBackButton(),
+            SizedBox(height: size.height.fivePercent),
+            Logo.small(),
+            SizedBox(height: size.height.twoPointFivePercent),
+            Text(
+              "HELP",
+              style: GoogleFonts.montserrat(
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: kFontColor,
-              ),),
-              SizedBox(height: 2,),
-              Center(
-                child: Text('''support@nearlikes.com''',textAlign:TextAlign.center,style: GoogleFonts.montserrat(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: kFontColor,
-                ),),
+                color: kTextColor[300],
               ),
-              SizedBox(height: 20,),
-              Icon(Icons.phone,color: kPrimaryOrange,),
-
-              SizedBox(height: 13,),
-              Text('''Phone''',textAlign:TextAlign.start,style: GoogleFonts.montserrat(
+            ),
+            SizedBox(height: size.height.twoPercent),
+            Text(
+              'We are happy to help you. \nFeel free to contact.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.montserrat(
                 fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: kFontColor,
-              ),),
-              SizedBox(height: 2,),
-              Center(
-                child: Text('''Call: +91 9392708293''',textAlign:TextAlign.center,style: GoogleFonts.montserrat(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: kFontColor,
-                ),),
+                fontWeight: FontWeight.w300,
+                color: kTextColor[300],
               ),
-              SizedBox(height: 20,),
-              Icon(Icons.phone_android,color: kPrimaryOrange,),
-              SizedBox(height: 13,),
-              Text('''Message''',textAlign:TextAlign.start,style: GoogleFonts.montserrat(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: kFontColor,
-              ),),
-              SizedBox(height: 2,),
-              Center(
-                child: Text('''WhatsApp: +91 9392708293''',textAlign:TextAlign.center,style: GoogleFonts.montserrat(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w400,
-                  color: kFontColor,
-                ),),
-              ),
+            ),
+            for (int i = 0; i < _contactItems.length; i++) ...[
+              _ContactItem(_contactItems[i]),
             ],
-          ),
+            Spacer(),
+            Text(
+              'Note: You can tap on any contact to reach us',
+              style: GoogleFonts.montserrat(
+                fontSize: 12,
+                fontWeight: FontWeight.w300,
+                color: kTextColor[300],
+                letterSpacing: 1.5,
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class _ContactItem extends StatelessWidget {
+  const _ContactItem(this._contact, {Key? key}) : super(key: key);
+
+  final Map<String, dynamic> _contact;
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    return Column(
+      children: [
+        SizedBox(height: size.height.fivePercent),
+        _contact['icon'],
+        SizedBox(height: size.height.twoPercent),
+        TapHandler(
+          onTap: _contact['onTap'],
+          child: Text(
+            _contact['title'],
+            textAlign: TextAlign.center,
+            style: GoogleFonts.montserrat(
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: kTextColor[300],
+            ),
+          ),
+        ),
+        SizedBox(height: size.height.onePercent),
+        TapHandler(
+          onTap: _contact['onTap'],
+          child: Text(
+            _contact['contact'],
+            textAlign: TextAlign.center,
+            style: GoogleFonts.montserrat(
+              fontSize: 15,
+              fontWeight: FontWeight.w300,
+              color: kTextColor[300],
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

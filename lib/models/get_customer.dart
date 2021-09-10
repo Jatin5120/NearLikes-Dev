@@ -13,14 +13,14 @@ class Customer {
     this.customer,
   });
 
-  CustomerClass customer;
+  CustomerClass? customer;
 
   factory Customer.fromJson(Map<String, dynamic> json) => Customer(
     customer: CustomerClass.fromJson(json["customer"]),
   );
 
   Map<String, dynamic> toJson() => {
-    "customer": customer.toJson(),
+    "customer": customer!.toJson(),
   };
 }
 
@@ -46,24 +46,24 @@ class CustomerClass {
     this.story,
   });
 
-  String id;
-  bool active;
-  List<dynamic> associations;
-  List<String> tags;
-  int createdAt;
-  List<Coupon> coupons;
-  List<Cashback> cashback;
-  String name;
-  int age;
-  String insta;
-  int followers;
-  String location;
-  String upi;
-  String phone;
-  int eat;
-  String token;
-  int v;
-  String story;
+  String? id;
+  bool? active;
+  List<dynamic>? associations;
+  List<String>? tags;
+  int? createdAt;
+  List<Coupon>? coupons;
+  List<Cashback>? cashback;
+  String? name;
+  int? age;
+  String? insta;
+  int? followers;
+  String? location;
+  String? upi;
+  String? phone;
+  int? eat;
+  String? token;
+  int? v;
+  String? story;
 
   factory CustomerClass.fromJson(Map<String, dynamic> json) => CustomerClass(
     id: json["_id"],
@@ -89,11 +89,11 @@ class CustomerClass {
   Map<String, dynamic> toJson() => {
     "_id": id,
     "active": active,
-    "associations": List<dynamic>.from(associations.map((x) => x)),
-    "tags": List<dynamic>.from(tags.map((x) => x)),
+    "associations": List<dynamic>.from(associations!.map((x) => x)),
+    "tags": List<dynamic>.from(tags!.map((x) => x)),
     "createdAt": createdAt,
-    "coupons": List<dynamic>.from(coupons.map((x) => x.toJson())),
-    "cashback": List<dynamic>.from(cashback.map((x) => x.toJson())),
+    "coupons": List<dynamic>.from(coupons!.map((x) => x.toJson())),
+    "cashback": List<dynamic>.from(cashback!.map((x) => x.toJson())),
     "name": name,
     "age": age,
     "insta": insta,
@@ -115,9 +115,9 @@ class Cashback {
     this.amount,
   });
 
-  bool used;
-  String id;
-  String amount;
+  bool? used;
+  String? id;
+  String? amount;
 
   factory Cashback.fromJson(Map<String, dynamic> json) => Cashback(
     used: json["used"],
@@ -143,13 +143,13 @@ class Coupon {
     this.link,
   });
 
-  bool used;
-  String id;
-  String code;
-  String brand;
-  String discount;
-  int expiry;
-  String link;
+  bool? used;
+  String? id;
+  String? code;
+  String? brand;
+  String? discount;
+  int? expiry;
+  String? link;
 
   factory Coupon.fromJson(Map<String, dynamic> json) => Coupon(
     used: json["used"],

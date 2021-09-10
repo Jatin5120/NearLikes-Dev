@@ -94,14 +94,14 @@ class GetCampaigns {
     this.campaigns,
   });
 
-  List<Campaign> campaigns;
+  List<Campaign>? campaigns;
 
   factory GetCampaigns.fromJson(Map<String, dynamic> json) => GetCampaigns(
     campaigns: List<Campaign>.from(json["campaigns"].map((x) => Campaign.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
-    "campaigns": List<dynamic>.from(campaigns.map((x) => x.toJson())),
+    "campaigns": List<dynamic>.from(campaigns!.map((x) => x.toJson())),
   };
 }
 
@@ -122,19 +122,19 @@ class Campaign {
     this.v,
   });
 
-  String id;
-  int createdAt;
-  String ownerId;
-  int followers;
-  String location;
-  int age;
-  String logo;
-  String status;
-  int start;
-  int end;
-  String brand;
-  String text;
-  int v;
+  String? id;
+  int? createdAt;
+  String? ownerId;
+  int? followers;
+  String? location;
+  int? age;
+  String? logo;
+  String? status;
+  int? start;
+  int? end;
+  String? brand;
+  String? text;
+  int? v;
 
   factory Campaign.fromJson(Map<String, dynamic> json) => Campaign(
     id: json["_id"],

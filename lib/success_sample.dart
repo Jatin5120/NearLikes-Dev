@@ -1,17 +1,45 @@
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:nearlikes/constants/constants.dart';
-import '../link_account.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class AccountSetup extends StatefulWidget {
-  const AccountSetup({Key? key}) : super(key: key);
+import '../page_guide.dart';
+import 'constants/constants.dart';
 
+class SuccessSample extends StatefulWidget {
+  final phoneNumber;
+  final interests;
+  const SuccessSample({Key? key, this.phoneNumber, this.interests})
+      : super(key: key);
   @override
-  _AccountSetupState createState() => _AccountSetupState();
+  _SuccessSampleState createState() => _SuccessSampleState();
 }
 
-class _AccountSetupState extends State<AccountSetup> {
+class _SuccessSampleState extends State<SuccessSample> {
+  late ConfettiController _controllerTopCenter;
+  List? mySelTeams;
+  String animationName = "celebrationstart";
+
+  void _playAnimation() {
+    setState(() {
+      if (animationName == "celebrationstart") {
+        animationName = "celebrationstop";
+      } else {
+        animationName = "celebrationstart";
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    _controllerTopCenter =
+        ConfettiController(duration: const Duration(seconds: 10));
+    _controllerTopCenter.play();
+    _playAnimation();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,34 +49,29 @@ class _AccountSetupState extends State<AccountSetup> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: kPrimaryColor,
-                      size: 30,
-                    )),
-              ),
+              // Align(
+              //   alignment: Alignment.centerLeft,
+              //   child: GestureDetector(
+              //       onTap: (){
+              //         Navigator.pop(context);
+              //       },
+              //       child: Icon(Icons.arrow_back,color: kPrimaryColor,size: 30,)),
+              // ),
               const SizedBox(
                 height: 92,
               ),
-              Image.asset('assets/logo.png', width: 65.54, height: 83),
+              Image.asset('assets/tick.png', width: 200, height: 200),
               const SizedBox(
                 height: 35,
               ),
               Center(
                 child: Text(
-                  "How to setup a \npromotional account",
+                  "Success!",
                   style: GoogleFonts.montserrat(
                     fontSize: 19,
                     fontWeight: FontWeight.w600,
-                    color: kTextColor,
+                    color: kTextColor[300],
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
               const SizedBox(
@@ -56,7 +79,7 @@ class _AccountSetupState extends State<AccountSetup> {
               ),
               Center(
                 child: Text(
-                  "You currently have a personal account. \nPlease follow the steps below to switch to a business account.",
+                  "Your instagram account was \nsuccessfully linked.",
                   style: GoogleFonts.montserrat(
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
@@ -66,29 +89,24 @@ class _AccountSetupState extends State<AccountSetup> {
                 ),
               ),
               const SizedBox(
-                height: 15,
+                height: 200,
               ),
-              Text(
-                "Here’s how to do it",
-                style: GoogleFonts.montserrat(
-                  decoration: TextDecoration.underline,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xff5186F2),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 210,
-              ),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0),
                 child: InkWell(
-                  onTap: () {
+                  onTap: () async {
+                    //storing for new acc or old acc
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.setBool('checkuser', true);
+                    prefs.setString('phonenumber', widget.phoneNumber);
+
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const LinkAccount()));
+                            builder: (context) =>
+                                PageGuide(phoneNumber: widget.phoneNumber)));
                   },
                   child: Container(
                       height: 50,
@@ -105,7 +123,7 @@ class _AccountSetupState extends State<AccountSetup> {
                         ),
                       ),
                       child: Center(
-                        child: Text('Back to Login',
+                        child: Text('Continue to Dashboard',
                             style: GoogleFonts.montserrat(
                               fontWeight: FontWeight.w500,
                               fontSize: 14,

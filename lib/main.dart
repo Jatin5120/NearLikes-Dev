@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:nearlikes/page_guide.dart';
-import 'package:nearlikes/register.dart';
-import 'package:nearlikes/setup_instructions.dart';
+import 'package:nearlikes/onboarding.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:nearlikes/splash_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'globals.dart'as globals;
-void main() async{
-   // WidgetsFlutterBinding.ensureInitialized();
-   // await Firebase.initializeApp();
-   globals.appNaviagtor=GlobalKey<NavigatorState>();
-   runApp(MaterialApp(
-            navigatorKey: globals.appNaviagtor,
-           debugShowCheckedModeBanner: false,
-           home: Nearlikes()
-       )
-   );
+
+import 'package:nearlikes/page_guide.dart';
+
+import 'globals.dart' as globals;
+import 'select_brand.dart';
+import 'splash_screen.dart';
+
+void main() async {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
+  globals.appNaviagtor = GlobalKey<NavigatorState>();
+  runApp(MaterialApp(
+      navigatorKey: globals.appNaviagtor,
+      debugShowCheckedModeBanner: false,
+      home: const Nearlikes()));
 }
 
 class Nearlikes extends StatefulWidget {
+  const Nearlikes({Key? key}) : super(key: key);
+
   @override
   _NearlikesState createState() => _NearlikesState();
 }
@@ -30,8 +31,8 @@ class _NearlikesState extends State<Nearlikes> {
     super.initState();
     configOneSignel();
   }
-  void configOneSignel()async
-  {
+
+  void configOneSignel() async {
     //Remove this method to stop OneSignal Debugging
     await OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
@@ -46,10 +47,10 @@ class _NearlikesState extends State<Nearlikes> {
     //       print('job done $value'));
     // });
   }
+
   @override
   Widget build(BuildContext context) {
-    return SplashScreen();
+    // return const PageGuide();
+    return const SplashScreen();
   }
 }
-
-
