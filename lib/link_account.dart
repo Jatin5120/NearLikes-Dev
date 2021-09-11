@@ -1,17 +1,23 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert' show json;
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:nearlikes/widgets/back_button.dart';
+import 'package:nearlikes/widgets/logo.dart';
+import 'package:nearlikes/widgets/tap_handler.dart';
+import 'package:nearlikes/widgets/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../choose_account.dart';
 import '../setup_instructions.dart';
 import 'constants/constants.dart';
+import 'services/services.dart';
 
 class LinkAccount extends StatefulWidget {
   final phnum, name, age, location;
@@ -53,9 +59,9 @@ class _LinkAccountState extends State<LinkAccount> {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return WillPopScope(
       onWillPop: () {
-        print('0505050');
         print(widget.location);
         return Navigator.pushReplacement(
           context,
@@ -73,50 +79,17 @@ class _LinkAccountState extends State<LinkAccount> {
           body: Stack(
         children: [
           SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 90),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: GestureDetector(
-                      onTap: () {
-                        print('09090909');
-                        print(widget.location);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SetupInstructions(
-                              phnum: widget.phnum,
-                              name: widget.name,
-                              age: widget.age,
-                              location: widget.location,
-                            ),
-                          ),
-                        );
-                      },
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: kPrimaryColor,
-                        size: 30,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 22,
-                  ),
-
-                  //const SizedBox(height: 15,),
-                  const SizedBox(
-                    height: 70,
-                  ),
-                  Image.asset('assets/logo.png', width: 65.54, height: 83),
-                  const SizedBox(
-                    height: 35,
-                  ),
-                  Center(
-                    child: Text(
+            child: SizedBox(
+              height: size.height,
+              child: Padding(
+                padding: pagePadding(size),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const MyBackButton(),
+                    const Logo.small(),
+                    SizedBox(height: size.height.tenPercent),
+                    Text(
                       "Link Account",
                       style: GoogleFonts.montserrat(
                         fontSize: 19,
@@ -124,29 +97,18 @@ class _LinkAccountState extends State<LinkAccount> {
                         color: kTextColor[300],
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Center(
-                    child: Text(
-                      "Login to Facebook to finish setting \nup your account.",
+                    SizedBox(height: size.height.twoPointFivePercent),
+                    Text(
+                      "Login to Facebook to finish setting up your account.",
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.montserrat(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                         color: kTextColor,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  // FlatButton(onPressed: (){
-                  //   fb.logOut();}, child:Text('logout')),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 0),
-                    child: InkWell(
+                    const Spacer(),
+                    TapHandler(
                       onTap: () async {
                         setState(() {
                           error = '';
@@ -205,17 +167,19 @@ class _LinkAccountState extends State<LinkAccount> {
                                 if (response3.statusCode == 200) {
                                   var decoded3 = json.decode(response3.body);
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => ChooseAccount(
-                                                igDetails: decoded3,
-                                                phnum: widget.phnum,
-                                                name: widget.name,
-                                                igUserId: igUserId,
-                                                location: widget.location,
-                                                age: widget.age,
-                                                accessToken: accessToken,
-                                              )));
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ChooseAccount(
+                                        igDetails: decoded3,
+                                        phnum: widget.phnum,
+                                        name: widget.name,
+                                        igUserId: igUserId,
+                                        location: widget.location,
+                                        age: widget.age,
+                                        accessToken: accessToken,
+                                      ),
+                                    ),
+                                  );
                                 } else {
                                   setState(() {
                                     error = 'Your Internet might be Slow!';
@@ -244,45 +208,42 @@ class _LinkAccountState extends State<LinkAccount> {
                         }
                       },
                       child: Container(
-                          height: 50,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              gradient: const LinearGradient(
-                                begin: Alignment.topRight,
-                                end: Alignment.bottomLeft,
-                                colors: [
-                                  Color(0xff4D6AA6),
-                                  Color(0xff4D6AA6),
-                                ],
-                              )),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset('assets/fb.png',
-                                    width: 21, height: 21),
-                                const SizedBox(
-                                  width: 20,
-                                ),
-                                Text('Login with Facebook',
-                                    style: GoogleFonts.montserrat(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                      //letterSpacing: 1
-                                    )),
-                              ],
+                        height: max(size.height.fivePercent, 48),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: const Color(0xff4D6AA6),
+                        ),
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 12.0),
+                              child: Image.asset('assets/fb.png'),
                             ),
-                          )),
+                            SizedBox(width: size.width.fivePercent),
+                            Text(
+                              'Login with Facebook',
+                              style: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Row(
+                    SizedBox(height: size.height.twoPercent),
+                    Text(
+                      error,
+                      style: const TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
+                    const Spacer(),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
@@ -294,7 +255,7 @@ class _LinkAccountState extends State<LinkAccount> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        GestureDetector(
+                        TapHandler(
                           onTap: () {},
                           child: Text(
                             " HELP",
@@ -303,115 +264,21 @@ class _LinkAccountState extends State<LinkAccount> {
                               fontWeight: FontWeight.w600,
                               color: kPrimaryColor,
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "NearLikes’s  ",
-                          style: GoogleFonts.montserrat(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            color: kTextColor,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        GestureDetector(
-                          onTap: _launchPrivacy,
-                          child: Text(
-                            "Privacy",
-                            style: GoogleFonts.montserrat(
-                              decoration: TextDecoration.underline,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff5186F2),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Text(
-                          "and  ",
-                          style: GoogleFonts.montserrat(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            color: kTextColor,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        GestureDetector(
-                          onTap: _launchTerms,
-                          child: Text(
-                            "Terms",
-                            style: GoogleFonts.montserrat(
-                              decoration: TextDecoration.underline,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff5186F2),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height - 600,
-                  ),
-                  Text(
-                    error,
-                    style: const TextStyle(
-                        color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
-                ],
+                    SizedBox(height: size.height.fivePercent),
+                    const TermsAndConditions(),
+                    SizedBox(height: size.height.twoPointFivePercent),
+                  ],
+                ),
               ),
             ),
           ),
-          loading == true
-              ? const Padding(
-                  padding: EdgeInsets.only(
-                    top: 250,
-                  ),
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      //valueColor: Colors.black,
-                      //Color: Colors.black,
-                      backgroundColor: Colors.white,
-                    ),
-                  ),
-                )
-              : Container(
-                  height: 0,
-                ),
+          if (loading == true) const LoadingDialog()
         ],
       )),
     );
-  }
-
-  _launchPrivacy() async {
-    const url = "https://nearlikes.com/privacy_policy.html";
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
-
-  _launchTerms() async {
-    const url = "https://nearlikes.com/termsofservice.html";
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
   }
 }

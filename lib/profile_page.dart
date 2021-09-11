@@ -124,7 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     //get();
     _profileListItems = [
-      {'title': 'Cash Rewards', 'screen': ScratchCards(cID: cID)},
+      {'title': 'Cash Rewards', 'screen': ScratchCards(cID: cID!)},
       {'title': 'Coupons', 'screen': Coupons(cID: cID)},
       {
         'title': 'Link UPI ID',

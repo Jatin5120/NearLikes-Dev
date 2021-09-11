@@ -207,7 +207,7 @@ class _HomePageState extends State<HomePage> {
             globals.appNaviagtor!.currentState!.push(
               MaterialPageRoute(
                 builder: (context) => ScratchCards(
-                  cID: cID,
+                  cID: cID!,
                 ),
               ),
             );
@@ -366,9 +366,10 @@ class _HomePageState extends State<HomePage> {
                                   final Campaign campaign =
                                       _getCampaigns!.campaigns![index];
                                   return BrandStories(
-                                    brand: campaign.brand,
-                                    id: campaign.ownerId,
-                                    campaignId: campaign.id,
+                                    brand: campaign.brand!,
+                                    id: campaign.ownerId!,
+                                    campaignId: campaign.id!,
+                                    brandMoto: campaign.text!,
                                   );
                                 },
                               ),

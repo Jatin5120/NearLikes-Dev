@@ -10,6 +10,7 @@ import 'package:nearlikes/widgets/long_button.dart';
 
 import '../otp_verification.dart';
 import 'constants/constants.dart';
+import 'widgets/widgets.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -37,24 +38,16 @@ class _LoginState extends State<Login> {
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: size.width.tenPercent,
-              vertical: size.height.sevenPointFivePercent,
+              vertical: size.height.fivePercent,
             ),
             child: Stack(
+              alignment: Alignment.center,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: kPrimaryColor,
-                        size: 30,
-                      ),
-                    ),
-                    SizedBox(height: size.height.fivePercent),
+                    const MyBackButton(),
+                    SizedBox(height: size.height.twoPointFivePercent),
                     Text(
                       "Login",
                       style: GoogleFonts.montserrat(
@@ -77,7 +70,7 @@ class _LoginState extends State<Login> {
                       width: double.maxFinite,
                       child: Image.asset('assets/login.png'),
                     ),
-                    SizedBox(height: size.height.fivePercent),
+                    SizedBox(height: size.height.onePercent),
                     Container(
                       padding: const EdgeInsets.all(10),
                       alignment: Alignment.center,
@@ -142,16 +135,18 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                     ),
-                    SizedBox(height: size.height.fivePercent),
+                    SizedBox(height: size.height.twoPointFivePercent),
                     Center(
-                        child: Text(
-                      error,
-                      style: const TextStyle(
+                      child: Text(
+                        error,
+                        style: const TextStyle(
                           fontSize: 15.5,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87),
-                    )),
-                    SizedBox(height: size.height.fivePercent),
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: size.height.twoPointFivePercent),
                     LongButton(
                       label: 'Continue',
                       givePadding: false,
@@ -191,22 +186,7 @@ class _LoginState extends State<Login> {
                     ),
                   ],
                 ),
-                loading == true
-                    ? const Padding(
-                        padding: EdgeInsets.only(
-                          top: 250,
-                        ),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            //valueColor: Colors.black,
-                            //Color: Colors.black,
-                            backgroundColor: Colors.white,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        height: 0,
-                      ),
+                if (loading == true) const LoadingDialog()
               ],
             ),
           ),

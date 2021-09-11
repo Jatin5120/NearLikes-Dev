@@ -10,6 +10,8 @@ const Color kWhiteColor = Color(0xFFFFFFFF);
 
 const Color kBlackColor = Color(0xff000000);
 
+const Color kBlueColor = Color(0xff5186F2);
+
 const Color kShadowColor = Color(0x11000000);
 
 const Color kOverlayColor = Color(0x66000000);

@@ -21,6 +21,8 @@ extension Percentage on double {
 
   double get thirtyPercent => (this * 0.3).roundToDouble();
 
+  double get fortyPercent => (this * 0.4).roundToDouble();
+
   double get fiftyPercent => (this * 0.5).roundToDouble();
 
   double get seventyPercent => (this * 0.7).roundToDouble();

@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nearlikes/constants/constants.dart';
+
+import 'widgets.dart';
 
 class LongButton extends StatelessWidget {
   const LongButton(
@@ -17,19 +21,18 @@ class LongButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    return InkWell(
-      splashColor: Colors.transparent,
-      hoverColor: Colors.transparent,
+    print(size.height.fivePercent);
+    return TapHandler(
       onTap: onTap,
       child: Container(
         margin: givePadding
             ? EdgeInsets.all(size.width.fivePercent)
             : EdgeInsets.zero,
         width: size.width,
-        height: size.height.fivePercent,
+        height: max(size.height.fivePercent, 48),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.0),
-          gradient: LinearGradient(
+          borderRadius: BorderRadius.circular(12.0),
+          gradient: const LinearGradient(
             colors: [kSecondaryColor, kPrimaryColor],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,

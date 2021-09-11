@@ -8,9 +8,9 @@ import 'package:nearlikes/widgets/widgets.dart';
 class Help extends StatelessWidget {
   const Help({Key? key}) : super(key: key);
 
-  static List<Map<String, dynamic>> _contactItems = [
+  static final List<Map<String, dynamic>> _contactItems = [
     {
-      'icon': Icon(Icons.mail_outline, color: kPrimaryColor),
+      'icon': const Icon(Icons.mail_outline, color: kPrimaryColor),
       'title': 'Email',
       'contact': 'support@nearlikes.com',
       'onTap': () => UrlLauncher.openMail(),
@@ -67,7 +67,7 @@ class Help extends StatelessWidget {
             for (int i = 0; i < _contactItems.length; i++) ...[
               _ContactItem(_contactItems[i]),
             ],
-            Spacer(),
+            const Spacer(),
             Text(
               'Note: You can tap on any contact to reach us',
               style: GoogleFonts.montserrat(

@@ -12,7 +12,7 @@ class UrlLauncher {
   static Future openLink({required String url}) => _launchUrl(url);
 
   static Future openWhatsapp() async {
-    final String url = 'https://wa.me/+919392708293';
+    const String url = 'https://wa.me/+919392708293';
     await _launchUrl(url);
   }
 
@@ -23,14 +23,14 @@ class UrlLauncher {
     // final String parameter = (sub == '' && bod == '') ? '' : '?$sub&$bod';
     // final String url = "mailto:$mail$parameter";
 
-    final String mail = 'support@nearlikes.com';
-    final String url = "mailto:$mail";
+    const String mail = 'support@nearlikes.com';
+    const String url = "mailto:$mail";
 
     await _launchUrl(url);
   }
 
   static Future openCall() async {
-    final String url = 'tel:+919392708293';
+    const String url = 'tel:+919392708293';
     await _launchUrl(url);
   }
 }

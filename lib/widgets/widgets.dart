@@ -4,3 +4,5 @@ export 'reward_card.dart';
 export 'logo.dart';
 export 'tap_handler.dart';
 export 'back_button.dart';
+export 'loading_dialog.dart';
+export 'terms_and_conditions.dart';

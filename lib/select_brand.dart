@@ -100,9 +100,10 @@ class SelectBrand extends StatelessWidget {
                                 final Campaign campaign =
                                     _getCampaigns!.campaigns![index];
                                 return BrandStories(
-                                  brand: campaign.brand,
-                                  id: campaign.ownerId,
-                                  campaignId: campaign.id,
+                                  brand: campaign.brand!,
+                                  id: campaign.ownerId!,
+                                  campaignId: campaign.id!,
+                                  brandMoto: campaign.text!,
                                 );
                               },
                             ),
@@ -114,7 +115,7 @@ class SelectBrand extends StatelessWidget {
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 image: (_getCampaigns == null
-                                    ? AssetImage('assets/logo.png')
+                                    ? const AssetImage('assets/logo.png')
                                     : NetworkImage(_getCampaigns!
                                         .campaigns![index]
                                         .logo!) as ImageProvider<Object>),
@@ -125,9 +126,9 @@ class SelectBrand extends StatelessWidget {
                             child: Stack(
                               children: [
                                 Container(
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     gradient: LinearGradient(
-                                      colors: const [
+                                      colors: [
                                         Colors.transparent,
                                         kOverlayColor,
                                       ],

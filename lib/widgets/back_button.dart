@@ -13,7 +13,7 @@ class MyBackButton extends StatelessWidget {
       child: TapHandler(
         onTap: () => Navigator.pop(context),
         child: const Padding(
-          padding: EdgeInsets.all(12.0),
+          padding: EdgeInsets.symmetric(vertical: 12.0),
           child: Icon(
             Icons.arrow_back,
             color: kPrimaryColor,

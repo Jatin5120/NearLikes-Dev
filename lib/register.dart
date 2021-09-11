@@ -6,11 +6,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_place_picker/google_maps_place_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:nearlikes/widgets/back_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:nearlikes/constants/constants.dart';
 
 import '../setup_instructions.dart';
+import 'widgets/widgets.dart';
 
 class Register extends StatefulWidget {
   final String? phNum;
@@ -61,58 +63,24 @@ class _RegisterState extends State<Register> {
   final _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 70),
+          padding: pagePadding(size),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: kPrimaryColor,
-                    size: 30,
-                  )),
-              const SizedBox(
-                height: 22,
-              ),
-              GestureDetector(
-                onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => PlacePicker(
-                  //       desiredLocationAccuracy: LocationAccuracy.high,
-                  //       apiKey: "AIzaSyCYgbMnw_D36TBv4gmyC8Lq0o-02MTEInU",   // Put YOUR OWN KEY here.
-                  //       onPlacePicked: (result) {
-                  //         print(result.formattedAddress);
-                  //         location=result.formattedAddress;
-                  //         print('the name is ${result.name}');
-                  //         print(result.adrAddress);
-                  //         //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>BottomNaviBar()));
-                  //       },
-                  //       initialPosition: kInitialPosition,
-                  //       useCurrentLocation: true,
-                  //     ),
-                  //   ),
-                  // );
-                },
-                child: Text(
-                  "Register",
-                  style: GoogleFonts.montserrat(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w700,
-                    color: kTextColor[300],
-                  ),
+              const MyBackButton(),
+              Text(
+                "Register",
+                style: GoogleFonts.montserrat(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w700,
+                  color: kTextColor[300],
                 ),
               ),
-              const SizedBox(
-                height: 24,
-              ),
+              SizedBox(height: size.height.onePercent),
               Text(
                 "Enter your details to get started.",
                 style: GoogleFonts.montserrat(
@@ -121,12 +89,10 @@ class _RegisterState extends State<Register> {
                   color: kTextColor,
                 ),
               ),
-              const SizedBox(
-                height: 5,
-              ),
-              Image.asset('assets/login.png', width: 301, height: 301),
-              const SizedBox(
-                height: 30,
+              SizedBox(height: size.height.onePercent),
+              SizedBox(
+                height: size.height.fortyPercent,
+                child: Image.asset('assets/login.png'),
               ),
               Form(
                 key: _formKey,
@@ -162,14 +128,13 @@ class _RegisterState extends State<Register> {
                             size: 20,
                           ),
                           enabledBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            borderSide:
-                                BorderSide(width: 1, color: Colors.transparent),
+                            borderSide: BorderSide.none,
                           ),
                           focusedBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            borderSide:
-                                BorderSide(width: 1, color: Colors.transparent),
+                            borderSide: BorderSide.none,
+                          ),
+                          errorBorder: const OutlineInputBorder(
+                            borderSide: BorderSide.none,
                           ),
                           labelText: "Full Name",
                           labelStyle: GoogleFonts.montserrat(
@@ -218,14 +183,13 @@ class _RegisterState extends State<Register> {
                             size: 20,
                           ),
                           enabledBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            borderSide:
-                                BorderSide(width: 1, color: Colors.transparent),
+                            borderSide: BorderSide.none,
                           ),
                           focusedBorder: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            borderSide:
-                                BorderSide(width: 1, color: Colors.transparent),
+                            borderSide: BorderSide.none,
+                          ),
+                          errorBorder: const OutlineInputBorder(
+                            borderSide: BorderSide.none,
                           ),
                           labelText: "Date of Birth(dd/mm/yyyy)",
                           labelStyle: GoogleFonts.montserrat(
@@ -282,150 +246,64 @@ class _RegisterState extends State<Register> {
               const SizedBox(
                 height: 15,
               ),
-
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "By clicking \"Register\", you agree to our ",
-                      style: GoogleFonts.montserrat(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        color: kTextColor,
-                      ),
-                      textAlign: TextAlign.center,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'By clicking "Register", you agree to ',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: kTextColor,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: _launchPrivacy,
-                          child: Text(
-                            "Privacy",
-                            style: GoogleFonts.montserrat(
-                              decoration: TextDecoration.underline,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff5186F2),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Text(
-                          "and  ",
-                          style: GoogleFonts.montserrat(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            color: kTextColor,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        GestureDetector(
-                          onTap: _launchTerms,
-                          child: Text(
-                            "Terms",
-                            style: GoogleFonts.montserrat(
-                              decoration: TextDecoration.underline,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff5186F2),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                    textAlign: TextAlign.center,
+                  ),
+                  const TermsAndConditions(),
+                ],
+              ),
+              Center(
+                child: Text(
+                  error,
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
-              //const SizedBox(height: 20,),
               Center(
-                  child: Text(
-                error,
-                style: const TextStyle(color: Colors.red),
-              )),
-              Center(
-                  child: Text(
-                error1,
-                style: const TextStyle(color: Colors.red),
-              )),
-              //const SizedBox(height: 10,),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0),
-                child: InkWell(
-                  onTap: () async {
-                    // await Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => PlacePicker(
-                    //       desiredLocationAccuracy: LocationAccuracy.high,
-                    //       apiKey: "AIzaSyCYgbMnw_D36TBv4gmyC8Lq0o-02MTEInU",   // Put YOUR OWN KEY here.
-                    //       onPlacePicked: (result) {
-                    //         print(result.formattedAddress);
-                    //         location=result.formattedAddress;
-                    //         print('the name is ${result.name}');
-                    //         print(result.adrAddress);
-                    //         Navigator.pop(context);
-                    //   //      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LinkAccount(phnum:widget.phNum ,age:dob ,name: name,location:result.formattedAddress ,)));
-                    //       },
-                    //       initialPosition: kInitialPosition,
-                    //       useCurrentLocation: true,
-                    //     ),
-                    //   ),
-                    // );
-
-                    String datePattern = "dd/MM/yyyy";
-                    print("asdasd $dob");
-                    DateTime birthDate = DateFormat(datePattern).parse(dob!);
-                    DateTime today = DateTime.now();
-
-                    int age = today.year - birthDate.year;
-                    // int monthDiff = today.month - birthDate.month;
-                    // int dayDiff = today.day - birthDate.day;
-                    print(age);
-                    print(location);
-                    if (_formKey.currentState!.validate()) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SetupInstructions(
-                                    phnum: widget.phNum,
-                                    name: name,
-                                    age: age,
-                                    location: location,
-                                  )));
-                      //Navigator.push(context, MaterialPageRoute(builder: (context) => LinkAccount(phnum: widget.phNum, name: name,age:age,location: location,)));
-                    } else {
-                      setState(() {
-                        error1 = "Please fill the above details";
-                      });
-                    }
-                  },
-                  child: Container(
-                      height: 50,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                            colors: [
-                              kSecondaryColor,
-                              kPrimaryColor,
-                            ],
-                          )),
-                      child: Center(
-                        child: Text('Register',
-                            style: GoogleFonts.montserrat(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: Colors.white,
-                              //letterSpacing: 1
-                            )),
-                      )),
+                child: Text(
+                  error1,
+                  style: const TextStyle(color: Colors.red),
                 ),
+              ),
+              LongButton(
+                label: 'Register',
+                givePadding: false,
+                onTap: () async {
+                  String datePattern = "dd/MM/yyyy";
+                  print("asdasd $dob");
+                  DateTime birthDate = DateFormat(datePattern).parse(dob!);
+                  DateTime today = DateTime.now();
+
+                  int age = today.year - birthDate.year;
+
+                  print(age);
+                  print(location);
+                  if (_formKey.currentState!.validate()) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SetupInstructions(
+                          phnum: widget.phNum,
+                          name: name,
+                          age: age,
+                          location: location,
+                        ),
+                      ),
+                    );
+                  } else {
+                    setState(() {
+                      error1 = "Please fill the above details";
+                    });
+                  }
+                },
               ),
             ],
           ),

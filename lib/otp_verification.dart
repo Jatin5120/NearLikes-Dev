@@ -6,6 +6,8 @@ import 'dart:convert' show json;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:nearlikes/widgets/back_button.dart';
+import 'package:nearlikes/widgets/long_button.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -97,8 +99,8 @@ class _OTPVerificationState extends State<OTPVerification> {
   @override
   void initState() {
     //verifyPhoneNum(widget.phNum);
-    startTimeout();
     super.initState();
+    startTimeout();
     startTimeout();
   }
 
@@ -109,25 +111,16 @@ class _OTPVerificationState extends State<OTPVerification> {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 90),
+          padding: pagePadding(size),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: kPrimaryColor,
-                    size: 30,
-                  )),
-              const SizedBox(
-                height: 22,
-              ),
+              const MyBackButton(),
+              SizedBox(height: size.height.twoPointFivePercent),
               Text(
                 "OTP\nVerification",
                 style: GoogleFonts.montserrat(
@@ -136,9 +129,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                   color: kTextColor[300],
                 ),
               ),
-              const SizedBox(
-                height: 24,
-              ),
+              SizedBox(height: size.height.onePercent),
               Text(
                 "Enter the OTP sent to +91 ${widget.phNum.toString()}",
                 style: GoogleFonts.montserrat(
@@ -147,12 +138,10 @@ class _OTPVerificationState extends State<OTPVerification> {
                   color: kTextColor,
                 ),
               ),
-              const SizedBox(
-                height: 22,
-              ),
-              Image.asset('assets/login.png', width: 301, height: 301),
-              const SizedBox(
-                height: 0,
+              SizedBox(height: size.height.onePercent),
+              SizedBox(
+                height: size.height.fortyPercent,
+                child: Image.asset('assets/login.png'),
               ),
               Form(
                 key: _formKey,
@@ -176,9 +165,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                       });
                     }),
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              SizedBox(height: size.height.twoPointFivePercent),
               timerText == '00:00'
                   ? Center(
                       child: expire == false
@@ -204,23 +191,26 @@ class _OTPVerificationState extends State<OTPVerification> {
                                   height: 30,
                                   width: 100,
                                   child: Center(
-                                      child: Text('Resend OTP',
-                                          style: GoogleFonts.montserrat(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 12,
-                                            color: Colors.white,
-                                            //letterSpacing: 1
-                                          ))),
+                                    child: Text(
+                                      'Resend OTP',
+                                      style: GoogleFonts.montserrat(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                   decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      gradient: const LinearGradient(
-                                        begin: Alignment.topRight,
-                                        end: Alignment.bottomLeft,
-                                        colors: [
-                                          kSecondaryColor,
-                                          kPrimaryColor,
-                                        ],
-                                      )),
+                                    borderRadius: BorderRadius.circular(10),
+                                    gradient: const LinearGradient(
+                                      begin: Alignment.topRight,
+                                      end: Alignment.bottomLeft,
+                                      colors: [
+                                        kSecondaryColor,
+                                        kPrimaryColor,
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             )
@@ -231,11 +221,12 @@ class _OTPVerificationState extends State<OTPVerification> {
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Center(
-                              child: Text(
-                            'Resend code in ',
-                            style: GoogleFonts.montserrat(
-                                color: Colors.black45, fontSize: 13),
-                          )),
+                            child: Text(
+                              'Resend code in ',
+                              style: GoogleFonts.montserrat(
+                                  color: Colors.black45, fontSize: 13),
+                            ),
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
@@ -249,9 +240,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                         ),
                       ],
                     ),
-              const SizedBox(
-                height: 30,
-              ),
+              SizedBox(height: size.height.twoPercent),
               Center(
                   child: Text(
                 error,
@@ -263,94 +252,55 @@ class _OTPVerificationState extends State<OTPVerification> {
               const SizedBox(
                 height: 10,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0),
-                child: InkWell(
-                  onTap: () async {
-                    if (_formKey.currentState!.validate()) {
-                      var response = await http.get(Uri.parse(
-                          'http://api.msg91.com/api/verifyRequestOTP.php?authkey=363206AVR1coo96wc60d47698P1&mobile=91${widget.phNum}&otp=$otp'));
-                      print(response.body);
-                      var decoded = json.decode(response.body);
-                      var type = decoded['type'];
-                      // var message = decoded['message'];
-                      //       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Register(widget.phNum)));
-                      if (type == 'success') {
-                        print('the num is ${widget.phNum}');
-                        //checking if old or new user
-                        var body = {
-                          "phone": "${widget.phNum}",
-                        };
+              LongButton(
+                label: 'Confirm',
+                givePadding: false,
+                onTap: () async {
+                  if (_formKey.currentState!.validate()) {
+                    var response = await http.get(Uri.parse(
+                        'http://api.msg91.com/api/verifyRequestOTP.php?authkey=363206AVR1coo96wc60d47698P1&mobile=91${widget.phNum}&otp=$otp'));
+                    print(response.body);
+                    var decoded = json.decode(response.body);
+                    var type = decoded['type'];
 
-                        var checkuser = await http.post(
-                          Uri.parse(
-                              'https://nearlikes.com/v1/api/client/check'),
-                          headers: {"Content-Type": "application/json"},
-                          body: json.encode(body),
-                        );
-                        print('the body is ${checkuser.body}');
-                        print(checkuser.statusCode);
-                        if (checkuser.body == '1') {
-                          SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
-                          prefs.setBool('checkuser', true);
-                          prefs.setString('phonenumber', widget.phNum!);
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PageGuide(
-                                        phoneNumber: widget.phNum,
-                                      )));
-                        } else {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      Register(widget.phNum)));
-                        }
-                      } else if (type == 'error') {
-                        setState(() {
-                          error = 'OTP Invalid';
-                        });
+                    if (type == 'success') {
+                      print('the num is ${widget.phNum}');
+                      //checking if old or new user
+                      var body = {
+                        "phone": "${widget.phNum}",
+                      };
+
+                      var checkuser = await http.post(
+                        Uri.parse('https://nearlikes.com/v1/api/client/check'),
+                        headers: {"Content-Type": "application/json"},
+                        body: json.encode(body),
+                      );
+                      print('the body is ${checkuser.body}');
+                      print(checkuser.statusCode);
+                      if (checkuser.body == '1') {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        prefs.setBool('checkuser', true);
+                        prefs.setString('phonenumber', widget.phNum!);
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PageGuide(
+                                      phoneNumber: widget.phNum,
+                                    )));
+                      } else {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Register(widget.phNum)));
                       }
+                    } else if (type == 'error') {
+                      setState(() {
+                        error = 'OTP Invalid';
+                      });
                     }
-
-                    // if(_formKey.currentState.validate()){
-                    //   await FirebaseAuth.instance.signInWithCredential(PhoneAuthProvider.credential(
-                    //       verificationId: veri, smsCode: otp)).catchError((e){setState(() {
-                    //         error=e.toString();
-                    //       });}).then((user) async {
-                    //         if(user!=null){
-                    //
-                    //       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Register()));
-                    //         }
-                    //   });
-                    //           Navigator.push(context, MaterialPageRoute(builder: (context) => Register()));
-                    //}
-                  },
-                  child: Container(
-                      height: 50,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                            colors: [
-                              kSecondaryColor,
-                              kPrimaryColor,
-                            ],
-                          )),
-                      child: Center(
-                        child: Text('Confirm',
-                            style: GoogleFonts.montserrat(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: Colors.white,
-                              //letterSpacing: 1
-                            )),
-                      )),
-                ),
+                  }
+                },
               ),
             ],
           ),

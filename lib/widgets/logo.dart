@@ -6,7 +6,7 @@ class Logo extends StatelessWidget {
       : isSmall = false,
         super(key: key);
 
-  Logo.small({Key? key})
+  const Logo.small({Key? key})
       : isSmall = true,
         super(key: key);
 
