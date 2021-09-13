@@ -21,7 +21,6 @@ class LongButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    print(size.height.fivePercent);
     return TapHandler(
       onTap: onTap,
       child: Container(

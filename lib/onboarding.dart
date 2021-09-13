@@ -79,7 +79,7 @@ class _OnBoardingState extends State<OnBoarding> {
               );
             }).toList(),
           ),
-          SizedBox(height: size.height * 0.05),
+          const Spacer(),
           LongButton(
             label: 'Get Started',
             onTap: () {
