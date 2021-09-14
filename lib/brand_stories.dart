@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -595,7 +593,8 @@ class _BrandStoriesState extends State<BrandStories> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => InstructionPost()));
+                                      builder: (context) =>
+                                          const InstructionPost()));
                             },
                             //color: Colors.orange,
                             child: Text(
@@ -727,7 +726,8 @@ class _BrandStoriesState extends State<BrandStories> {
                                                 child: _getMedia!.media![index]
                                                             .type ==
                                                         'image'
-                                                    ? Container(
+                                                    ? 
+                                                    Container(
                                                         margin: const EdgeInsets
                                                                 .fromLTRB(
                                                             35, 0, 35, 0),
@@ -738,52 +738,47 @@ class _BrandStoriesState extends State<BrandStories> {
                                                             Radius.circular(10),
                                                           ),
                                                         ),
-                                                        child: Center(
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    bottom: 5),
-                                                            child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8),
-                                                                  border: Border
-                                                                      .all(
-                                                                    color: selected ==
-                                                                            "${_getMedia!.media![index].src}"
-                                                                        ? kBlackColor
-                                                                        : kWhiteColor,
-                                                                  ),
-                                                                ),
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(8),
-                                                                child: _getMedia!
-                                                                            .media![index]
-                                                                            .type ==
-                                                                        'image'
-                                                                    ? CachedNetworkImage(
-                                                                        imageUrl:
-                                                                            "${_getMedia!.media![index].src}",
-                                                                        progressIndicatorBuilder: (context,
-                                                                                url,
-                                                                                downloadProgress) =>
-                                                                            CircularProgressIndicator(value: downloadProgress.progress),
-                                                                        errorWidget: (context,
-                                                                                url,
-                                                                                error) =>
-                                                                            const Icon(Icons.error),
-                                                                      )
-                                                                    : Container(
-                                                                        height:
-                                                                            0,
-                                                                      )),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                bottom: 5),
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                            border: Border.all(
+                                                              color: selected ==
+                                                                      "${_getMedia!.media![index].src}"
+                                                                  ? kBlackColor
+                                                                  : kWhiteColor,
+                                                            ),
                                                           ),
-                                                        ))
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8),
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            imageUrl:
+                                                                "${_getMedia!.media![index].src}",
+                                                            progressIndicatorBuilder: (context,
+                                                                    url,
+                                                                    downloadProgress) =>
+                                                                CircularProgressIndicator(
+                                                                    value: downloadProgress
+                                                                        .progress),
+                                                            errorWidget: (context,
+                                                                    url,
+                                                                    error) =>
+                                                                const Icon(Icons
+                                                                    .error),
+                                                          ),
+                                                        ),
+                                                      )
                                                     : Container(
                                                         height: 0,
                                                       ),
@@ -807,50 +802,55 @@ class _BrandStoriesState extends State<BrandStories> {
                                         // physics: NeverScrollableScrollPhysics(),
                                         itemCount: _getMedia!.media!.length,
                                         itemBuilder: (BuildContext ctx, index) {
-                                          return _getMedia!
-                                                      .media![index].type ==
-                                                  'video'
-                                              ? GestureDetector(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      setState(() {
-                                                        selected =
-                                                            "${_getMedia!.media![index].src}";
-                                                        mediaType =
-                                                            "${_getMedia!.media![index].type}";
-                                                        choice = index;
-                                                        error = '';
-                                                      });
-
-                                                      // _controller = VideoPlayerController.network('${_getMedia.media[index].src}');
-                                                      // print('the video url is ${_controller.toString()}');
-                                                      // _controller.value.isPlaying ? _controller.pause() : _controller.play();
-                                                    });
-                                                    // _controller = VideoPlayerController.network('${_getMedia.media[index].src}');
-                                                    // _controller.addListener(() {
-                                                    //   setState(() {});
-                                                    // });
-                                                    // _controller.setLooping(true);
-                                                    // _controller.initialize().then((_) => setState(() {}));
-                                                    // _controller.play();
-                                                    setState(() {
-                                                      videoinit = true;
-                                                    });
-                                                  },
-                                                  child: Container(
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(10),
+                                          return GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  selected =
+                                                      "${_getMedia!.media![index].src}";
+                                                  mediaType =
+                                                      "${_getMedia!.media![index].type}";
+                                                  choice = index;
+                                                  error = '';
+                                                });
+                                              },
+                                              child: _getMedia!
+                                                          .media![index].type ==
+                                                      'video'
+                                                  ? Container(
+                                                      margin: const EdgeInsets
+                                                              .fromLTRB(
+                                                          35, 0, 35, 0),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                           
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                          Radius.circular(10), 
+                                                        ),
                                                       ),
-                                                    ),
-                                                    child: Center(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                bottom: 5),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 5),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                             color: Colors.transparent,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                         
+                                                            border: Border.all(
+                                                              color: selected ==
+                                                                      "${_getMedia!.media![index].src}"
+                                                                  ? kBlackColor
+                                                                  : kWhiteColor,
+                                                            ),
+                                                          ),
+                                                       padding:
+                                                              const EdgeInsets
+                                                                  .all(0),
                                                         child: VideoWidget(
                                                           play: true,
                                                           url:
@@ -858,12 +858,11 @@ class _BrandStoriesState extends State<BrandStories> {
                                                           selected: selected,
                                                         ),
                                                       ),
-                                                    ),
-                                                  ),
-                                                )
-                                              : Container(
-                                                  height: 0,
-                                                );
+                                                    )
+
+                                                  : Container(
+                                                      height: 0,
+                                                    ));
                                         },
                                       );
                                     },
@@ -1208,33 +1207,26 @@ class _VideoWidgetState extends State<VideoWidget> {
             onTap: () {
               _controller.play();
             },
-            child: Container(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: selected == widget.url
-                                ? kBlackColor
-                                : kWhiteColor,
-                          ),
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: AspectRatio(
-                          aspectRatio: _controller.value.aspectRatio,
-                          child: VideoPlayer(_controller),
-                        )
-                        // videoinit==false? Image.network("${_getMedia.media[index].pre}",fit: BoxFit.fitWidth): AspectRatio(
-                        //   aspectRatio: _controller.value.aspectRatio,
-                        //   child: VideoPlayer(_controller),
-                        // ),
-                        ),
-                  ),
-                ],
-              ),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      )
+                      // videoinit==false? Image.network("${_getMedia.media[index].pre}",fit: BoxFit.fitWidth): AspectRatio(
+                      //   aspectRatio: _controller.value.aspectRatio,
+                      //   child: VideoPlayer(_controller),
+                      // ),
+                      ),
+                ),
+              ],
             ),
           );
         } else {

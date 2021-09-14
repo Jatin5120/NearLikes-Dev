@@ -113,17 +113,15 @@ class _ProfilePageState extends State<ProfilePage> {
     print('Phone number --> $phonenumber');
     print('Customer id --> $customerId');
     if (customerId == null) {
-      getCustomerId(phonenumber);
+      await getCustomerId(phonenumber);
     } else {
-      getCustomer(customerId);
+      await getCustomer(customerId);
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    //get();
-    _profileListItems = [
+ initialize() async{
+  await getUserData();
+   _profileListItems = [
       {'title': 'Cash Rewards', 'screen': ScratchCards(cID: cID!)},
       {'title': 'Coupons', 'screen': Coupons(cID: cID)},
       {
@@ -138,7 +136,14 @@ class _ProfilePageState extends State<ProfilePage> {
       },
       {'title': 'LogOut', 'screen': const Login(), 'isLast': true}
     ];
+ }
+
+  @override
+  void initState() {
+    super.initState();
+    //get();
     getUserData();
+   
   }
 
   @override
