@@ -37,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? phonenumber;
   String? customerId;
 
-  late List<Map<String, dynamic>> _profileListItems;
+  List<Map<String, dynamic>> _profileListItems = [];
 
   Future<Customer?> getCustomer(String? customerId) async {
     const String apiUrl = "https://nearlikes.com/v1/api/client/own/fetch";
@@ -98,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       var test = jsonDecode(response.body);
       print('the response is $test');
-      getCustomer(test);
+      await getCustomer(test);
     } catch (e) {
       print("Error--> $e");
     }
@@ -113,16 +113,14 @@ class _ProfilePageState extends State<ProfilePage> {
     print('Phone number --> $phonenumber');
     print('Customer id --> $customerId');
     if (customerId == null) {
-      getCustomerId(phonenumber);
+      await getCustomerId(phonenumber);
     } else {
-      getCustomer(customerId);
+      await getCustomer(customerId);
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    //get();
+  initialize() async {
+    await getUserData();
     _profileListItems = [
       {'title': 'Cash Rewards', 'screen': ScratchCards(cID: cID!)},
       {'title': 'Coupons', 'screen': Coupons(cID: cID)},
@@ -138,7 +136,13 @@ class _ProfilePageState extends State<ProfilePage> {
       },
       {'title': 'LogOut', 'screen': const Login(), 'isLast': true}
     ];
-    getUserData();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    //get();
+    initialize();
   }
 
   @override
@@ -157,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: SizedBox(
               width: double.infinity,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     name!,
@@ -226,7 +230,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         );
                       },
-                      separatorBuilder: (_, index) => Divider(),
+                      separatorBuilder: (_, index) => const Divider(),
                     ),
                   ),
                 ],

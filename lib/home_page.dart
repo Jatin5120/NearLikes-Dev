@@ -20,7 +20,6 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'globals.dart' as globals;
 import 'package:badges/badges.dart';
 import '../constants/constants.dart';
-import 'services/services.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -97,45 +96,6 @@ class _HomePageState extends State<HomePage> {
     prefs.setString('token', _getCustomer!.customer!.token!);
     return _getCustomer;
   }
-
-  // Future<Customer> getCustomer(String customerId) async {
-  //   print(".....");
-  //   print(customerId);
-  //   final String apiUrl = "https://nearlikes.com/v1/api/client/own/fetch";
-  //   var body = {
-  //     "id" : "$customerId"
-  //   };
-  //   final response = await http.post(
-  //     Uri.parse(apiUrl),
-  //     headers: {"Content-Type": "application/json"},
-  //     body: json.encode(body),
-  //   );
-  //
-  //   print(".....");
-  //   print(response.body);
-  //   final String responseString = response.body.toString();
-  //
-  //   print('-----------');
-  //   _getCustomer = customerFromJson(responseString);
-  //
-  //   for(int i=0;i<_getCustomer.customer.cashback.length;i++)
-  //   { if(_getCustomer.customer.cashback[i].used)
-  //   {
-  //     print(_getCustomer.customer.cashback[i].amount);
-  //     var a = int.parse(_getCustomer.customer.cashback[i].amount);
-  //     assert(a is int);
-  //
-  //     sum = sum + a;
-  //   }
-  //   }
-  //   print(sum);
-  //   print(";;;");
-  //   print(_getCustomer.customer.name);
-  //   setState(() {
-  //     name=_getCustomer.customer.name;
-  //   });
-  //   return _getCustomer;
-  // }
 
   Future<void> getCustomerId(String? phonenumber) async {
     final Map<String, String> body = {"phone": "+91$phonenumber"};
@@ -346,15 +306,14 @@ class _HomePageState extends State<HomePage> {
                     return GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 200,
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: size.width.fortyPercent,
                         childAspectRatio: 3 / 4,
-                        crossAxisSpacing: 20,
-                        mainAxisSpacing: 20,
+                        crossAxisSpacing: size.width.fivePercent,
+                        mainAxisSpacing: size.width.fivePercent,
                       ),
                       itemCount: _getCampaigns?.campaigns!.length ?? 1,
-                      itemBuilder: (BuildContext ctx, index) {
+                      itemBuilder: (_, index) {
                         return GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -379,7 +338,7 @@ class _HomePageState extends State<HomePage> {
                               decoration: BoxDecoration(
                                 image: DecorationImage(
                                   image: (_getCampaigns == null
-                                      ? AssetImage('assets/logo.png')
+                                      ? const AssetImage('assets/logo.png')
                                       : NetworkImage(_getCampaigns!
                                           .campaigns![index]
                                           .logo!) as ImageProvider<Object>),
@@ -390,9 +349,9 @@ class _HomePageState extends State<HomePage> {
                               child: Stack(
                                 children: [
                                   Container(
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: const [
+                                        colors: [
                                           Colors.transparent,
                                           kOverlayColor,
                                         ],

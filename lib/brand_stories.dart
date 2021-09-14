@@ -331,11 +331,12 @@ class _BrandStoriesState extends State<BrandStories> {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
         key: _scaffoldKey,
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: kWhiteColor,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -549,12 +550,14 @@ class _BrandStoriesState extends State<BrandStories> {
                   }
                 },
                 child: Center(
-                  child: Text('Post a story',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      )),
+                  child: Text(
+                    'Post a story',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -573,47 +576,45 @@ class _BrandStoriesState extends State<BrandStories> {
                           const EdgeInsets.only(left: 40, right: 40, top: 0),
                       alignment: Alignment.centerLeft,
                       child: GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            Icons.arrow_back,
-                            color: kPrimaryColor,
-                            size: 30,
-                          )),
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: kPrimaryColor,
+                          size: 30,
+                        ),
+                      ),
                     ),
                     Container(
                       padding:
                           const EdgeInsets.only(left: 40, right: 40, top: 0),
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const InstructionPost(),
+                              ),
+                            );
                           },
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => InstructionPost()));
-                            },
-                            //color: Colors.orange,
-                            child: Text(
-                              'Help',
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          )),
-                    ),
-                    SizedBox(
-                      height: 0,
+                          child: const Text(
+                            'Help',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
                     ),
                     Image.asset('assets/logo.png', width: 46.31, height: 60),
-                    SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     Center(
                       child: Text(
                         "${widget.brand} BRAND".toUpperCase(),
@@ -624,53 +625,7 @@ class _BrandStoriesState extends State<BrandStories> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    // FutureBuilder(
-                    //     future: getAvailableMedia(id:widget.id),
-                    //     builder: (context, AsyncSnapshot snapshot) {
-                    //       if (!snapshot.hasData) {
-                    //         return Center(child: CircularProgressIndicator());
-                    //       }
-                    //
-                    //       return Container(
-                    //           child:  ListView.builder(
-                    //               shrinkWrap: true,
-                    //               physics: NeverScrollableScrollPhysics(),
-                    //               itemCount: _getMedia.media.length,
-                    //               itemBuilder: (BuildContext ctx, index) {
-                    //                 return GestureDetector(
-                    //                     onTap: () {
-                    //                       setState(() {
-                    //                         selected="${_getMedia.media[index].src}";
-                    //                         choice=index;
-                    //                         error='';
-                    //
-                    //                       });
-                    //                     },
-                    //                     child: Container(
-                    //                         decoration: BoxDecoration(
-                    //                             borderRadius:
-                    //                             BorderRadius.all(Radius.circular(10))),
-                    //                         child: Center(
-                    //                           child: Padding(
-                    //                             padding: const EdgeInsets.only(bottom: 20),
-                    //                             child: Container(
-                    //                                 decoration: BoxDecoration(
-                    //                                     borderRadius: BorderRadius.circular(8),
-                    //                                     border: Border.all(color: selected=="${_getMedia.media[index].src}"? Color(0xff000000):Color(0xffffffff))
-                    //                                 ),
-                    //                                 padding: const EdgeInsets.all(8),
-                    //                                 child: Image.network("${_getMedia.media[index].src}",fit: BoxFit.fitWidth)
-                    //                             ),
-                    //                           ),
-                    //                         )));
-                    //               }));
-                    //
-                    //       //return Container();
-                    //     }),
-
+                    const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.only(bottom: 100),
                       height: 700,
@@ -697,35 +652,32 @@ class _BrandStoriesState extends State<BrandStories> {
                               child: TabBarView(
                                 children: [
                                   FutureBuilder(
-                                      future: getAvailableMedia(id: widget.id),
-                                      // stream: _postsController.stream,
-                                      builder:
-                                          (context, AsyncSnapshot snapshot) {
-                                        if (!snapshot.hasData) {
-                                          return const Center(
-                                              child:
-                                                  CircularProgressIndicator());
-                                        }
+                                    future: getAvailableMedia(id: widget.id),
+                                    // stream: _postsController.stream,
+                                    builder: (context, AsyncSnapshot snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return const Center(
+                                            child: CircularProgressIndicator());
+                                      }
 
-                                        return ListView.builder(
-                                            shrinkWrap: true,
-                                            // physics: NeverScrollableScrollPhysics(),
-                                            itemCount: _getMedia!.media!.length,
-                                            itemBuilder:
-                                                (BuildContext ctx, index) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selected =
-                                                        "${_getMedia!.media![index].src}";
-                                                    mediaType =
-                                                        "${_getMedia!.media![index].type}";
-                                                    choice = index;
-                                                    error = '';
-                                                  });
-                                                },
-                                                child: _getMedia!.media![index]
-                                                            .type ==
+                                      return ListView.builder(
+                                        shrinkWrap: true,
+                                        // physics: NeverScrollableScrollPhysics(),
+                                        itemCount: _getMedia!.media!.length,
+                                        itemBuilder: (BuildContext ctx, index) {
+                                          return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selected =
+                                                    "${_getMedia!.media![index].src}";
+                                                mediaType =
+                                                    "${_getMedia!.media![index].type}";
+                                                choice = index;
+                                                error = '';
+                                              });
+                                            },
+                                            child:
+                                                _getMedia!.media![index].type ==
                                                         'image'
                                                     ? Container(
                                                         margin: const EdgeInsets
@@ -745,53 +697,54 @@ class _BrandStoriesState extends State<BrandStories> {
                                                                         .only(
                                                                     bottom: 5),
                                                             child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              8),
-                                                                  border: Border
-                                                                      .all(
-                                                                    color: selected ==
-                                                                            "${_getMedia!.media![index].src}"
-                                                                        ? kBlackColor
-                                                                        : kWhiteColor,
-                                                                  ),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            8),
+                                                                border:
+                                                                    Border.all(
+                                                                  color: selected ==
+                                                                          "${_getMedia!.media![index].src}"
+                                                                      ? kBlackColor
+                                                                      : kWhiteColor,
                                                                 ),
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(8),
-                                                                child: _getMedia!
-                                                                            .media![index]
-                                                                            .type ==
-                                                                        'image'
-                                                                    ? CachedNetworkImage(
-                                                                        imageUrl:
-                                                                            "${_getMedia!.media![index].src}",
-                                                                        progressIndicatorBuilder: (context,
-                                                                                url,
-                                                                                downloadProgress) =>
-                                                                            CircularProgressIndicator(value: downloadProgress.progress),
-                                                                        errorWidget: (context,
-                                                                                url,
-                                                                                error) =>
-                                                                            const Icon(Icons.error),
-                                                                      )
-                                                                    : Container(
-                                                                        height:
-                                                                            0,
-                                                                      )),
+                                                              ),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8),
+                                                              child: _getMedia!
+                                                                          .media![
+                                                                              index]
+                                                                          .type ==
+                                                                      'image'
+                                                                  ? CachedNetworkImage(
+                                                                      imageUrl:
+                                                                          "${_getMedia!.media![index].src}",
+                                                                      progressIndicatorBuilder: (context,
+                                                                              url,
+                                                                              downloadProgress) =>
+                                                                          CircularProgressIndicator(
+                                                                              value: downloadProgress.progress),
+                                                                      errorWidget: (context,
+                                                                              url,
+                                                                              error) =>
+                                                                          const Icon(
+                                                                              Icons.error),
+                                                                    )
+                                                                  : SizedBox
+                                                                      .fromSize(),
+                                                            ),
                                                           ),
-                                                        ))
-                                                    : Container(
-                                                        height: 0,
-                                                      ),
-                                              );
-                                            });
-
-                                        //return Container();
-                                      }),
+                                                        ),
+                                                      )
+                                                    : SizedBox.fromSize(),
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
 
                                   // Text('testing'),
                                   FutureBuilder(
