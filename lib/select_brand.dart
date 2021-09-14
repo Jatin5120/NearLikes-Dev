@@ -93,22 +93,22 @@ class SelectBrand extends StatelessWidget {
                         splashColor: Colors.transparent,
                         hoverColor: Colors.transparent,
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) {
-                                final Campaign campaign =
-                                    _getCampaigns!.campaigns![index];
-                                return BrandStories(
-                                  brand: campaign.brand!,
-                                  id: campaign.ownerId!,
-                                  campaignId: campaign.id!,
-                                  brandMoto: campaign.text!,
-                                );
-                              },
-                            ),
-                          );
-                        },
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  final Campaign campaign =
+                                      _getCampaigns!.campaigns![index];
+                                  return BrandStories(
+                                    brand: campaign.brand!,
+                                    id: campaign.ownerId!,
+                                    campaignId: campaign.id!,
+                                    brandMoto: campaign.text!,
+                                  );
+                                },
+                              ),
+                            );
+                          },
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
                           child: Container(
