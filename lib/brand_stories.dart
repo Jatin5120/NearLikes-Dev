@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -73,8 +75,7 @@ Future<GetMedia?> getAvailableMedia({required String id}) async {
 
   final String responseString = response.body;
   _getMedia = getMediaFromJson(responseString);
-  print('==22== $responseString');
-  print('==3==');
+  print('getAvailableMedia --> $responseString');
 
   return _getMedia;
 }
@@ -173,9 +174,9 @@ checkstryId(List stryids, id, campaignId, customerId) async {
   }
 }
 
-addStry(String url) async {
+Future<String?> addStory(String url) async {
   String result = '';
-  print('hghghghg123');
+  print('addStory');
   if (mediaType == 'image') {
     var response = await http.get(Uri.parse(url));
     var documentDirectory = await getApplicationDocumentsDirectory();
@@ -308,7 +309,8 @@ class _BrandStoriesState extends State<BrandStories> {
     getUserData();
     getInstaId();
 
-    _controllerTopCenter = ConfettiController(duration: Duration(seconds: 10));
+    _controllerTopCenter =
+        ConfettiController(duration: const Duration(seconds: 10));
     _controllerTopCenter.play();
     getAvailableMedia(id: widget.id);
     // loadPosts(widget.id);
@@ -331,570 +333,527 @@ class _BrandStoriesState extends State<BrandStories> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
-        key: _scaffoldKey,
-        bottomNavigationBar: Container(
+      key: _scaffoldKey,
+      // ---------------------- Post Story Button ---------------------------
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+        decoration: const BoxDecoration(
+          color: kWhiteColor,
+          boxShadow: [
+            BoxShadow(
+              color: kShadowColor,
+              offset: Offset(8, 4),
+              blurRadius: 20.0,
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: Container(
+          height: 40,
+          width: 185,
           decoration: BoxDecoration(
-            color: kWhiteColor,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                offset: const Offset(
-                  8,
-                  4,
-                ),
-                blurRadius: 20.0,
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: Padding(
-            padding:
-                const EdgeInsets.only(top: 10, bottom: 10, right: 50, left: 50),
-            child: Container(
-              height: 40,
-              width: 185,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
+            borderRadius: BorderRadius.circular(20),
+            color: selected == "" ? Colors.grey : null,
+            gradient: selected != ""
+                ? const LinearGradient(
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
-                    colors: [
-                      selected == "" ? Colors.grey : kSecondaryColor,
-                      selected == "" ? Colors.grey : kPrimaryColor,
-                    ],
-                  )),
-              child: InkWell(
-                onTap: () async {
-                  if (selected != "") {
-                    setState(() {
-                      error = '';
-                    });
-                    var maxstry = await checkMaxStry();
-                    print('the maxstry is $maxstry');
-                    if (maxstry == 200) {
-                      return showDialog(
-                        context: _scaffoldKey.currentContext!,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text(widget.brand),
-                            content: Text(
-                                '${widget.brandMoto.toString()} \n Note: Add #nearlikes to your story'),
-                            actions: [
-                              // Expanded(child: Text('Note: Add #nearlikes to your story',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)),
-                              ElevatedButton(
-                                child: const Text('Cancel'),
-                                onPressed: () {
-                                  print('//b hello //b');
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              ElevatedButton(
-                                child: const Text('Ok'),
-                                onPressed: () async {
-                                  setState(() {
-                                    loading1 = true;
-                                  });
-                                  response = await addStry(selected);
-                                  print('the response is $response');
-                                  if (response == 'success') {
-                                    // setState(() {
-                                    //   loading1=false;
-                                    // });
-                                    //setState(() {loading=true;});
-                                    _mockCheckForSession(mediaType).then(
-                                      (value) {
-                                        return showDialog(
-                                          context: _scaffoldKey.currentContext!,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              title: const Text(
-                                                  'Checking your Story'),
-                                              content: const Text(
-                                                  'Have you posted Instagram Story?'),
-                                              actions: <Widget>[
-                                                ElevatedButton(
-                                                  child: const Text('No'),
-                                                  onPressed: () {
-                                                    print('//b hello //b');
-                                                    Navigator.pop(context);
-                                                  },
-                                                ),
-                                                ElevatedButton(
-                                                  child: const Text('Yes'),
-                                                  onPressed: () async {
-                                                    setState(() {
-                                                      loading1 = true;
-                                                    });
+                    colors: [kSecondaryColor, kPrimaryColor],
+                  )
+                : null,
+          ),
+          child: InkWell(
+            onTap: () async {
+              if (selected != "") {
+                setState(() {
+                  error = '';
+                });
+                int statusCode = await checkMaxStry();
+                print('the maxstry is $statusCode');
+                if (statusCode == 200) {
+                  return showDialog(
+                    context: _scaffoldKey.currentContext!,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text(widget.brand),
+                        content: Text(
+                          '${widget.brandMoto.toString()} \n Note: Add #nearlikes to your story',
+                        ),
+                        actions: [
+                          // Expanded(child: Text('Note: Add #nearlikes to your story',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)),
+                          ElevatedButton(
+                            child: const Text('Cancel'),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          ElevatedButton(
+                            child: const Text('Ok'),
+                            onPressed: () async {
+                              setState(() {
+                                loading1 = true;
+                              });
+                              String? response = await addStory(selected);
+                              print('the response is $response');
+                              if (response == 'success') {
+                                // setState(() {
+                                //   loading1=false;
+                                // });
+                                //setState(() {loading=true;});
+                                _mockCheckForSession(mediaType).then(
+                                  (value) {
+                                    return showDialog(
+                                      context: _scaffoldKey.currentContext!,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title:
+                                              const Text('Checking your Story'),
+                                          content: const Text(
+                                              'Have you posted Instagram Story?'),
+                                          actions: <Widget>[
+                                            ElevatedButton(
+                                              child: const Text('No'),
+                                              onPressed: () {
+                                                print('//b hello //b');
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                            ElevatedButton(
+                                              child: const Text('Yes'),
+                                              onPressed: () async {
+                                                setState(() {
+                                                  loading1 = true;
+                                                });
 
-                                                    var response =
-                                                        await checkstry(
-                                                            instaPgId!);
-                                                    if (response == 'error') {
-                                                      setState(() {
-                                                        error =
-                                                            'Post Story and Try Again';
-                                                        loading1 = false;
-                                                      });
-                                                      Navigator.pop(context);
-                                                    } else {
-                                                      for (var i = 0;
-                                                          i <
-                                                              _getStory!
-                                                                  .data!.length;
-                                                          i++) {
-                                                        try {
-                                                          RegExp exp = RegExp(
-                                                            caption,
-                                                            caseSensitive:
-                                                                false,
-                                                          );
-                                                          bool containe =
-                                                              exp.hasMatch(
-                                                                  _getStory!
-                                                                      .data![i]
-                                                                      .caption!);
-                                                          print('in...');
-                                                          if (containe ==
-                                                              true) {
-                                                            storyId.add(
-                                                                _getStory!
-                                                                    .data![i]
-                                                                    .id!);
-                                                            // checkstryId(stry_id.toSet().toList(growable: true),widget.campaign_id);
-                                                          } else {
-                                                            setState(() {
-                                                              loading1 = false;
-                                                            });
-                                                            //Navigator.pop(context);
-                                                          }
-                                                        } catch (e) {
-                                                          // setState((){error='';});
-                                                          setState(() {
-                                                            loading1 = false;
-                                                          });
-                                                          //Navigator.pop(context);
-                                                        }
-                                                        // if(_getStry.data[i].caption==caption){
-                                                        //   String id=_getStry.data[i].id;
-                                                        //   print(id.toString());
-                                                        //   Navigator.pop(context);
-                                                        //   Navigator.push(context, MaterialPageRoute(
-                                                        //       builder: (context) => ScratchCards()));
-                                                        //
-                                                        // }
-                                                        // else setState(() {error='Post Story with given Instruction';});
-                                                      }
-                                                    }
-                                                    var value =
-                                                        await checkstryId(
-                                                            storyId
-                                                                .toSet()
-                                                                .toList(
-                                                                    growable:
-                                                                        true),
-                                                            widget.id,
-                                                            widget.campaignId,
-                                                            customerId);
-                                                    if (value == 200) {
-                                                      print('in dialog');
-                                                      setState(() {
-                                                        loading1 = false;
-                                                      });
-                                                      Navigator.pop(context);
-                                                      Navigator.pop(context);
-                                                      Navigator.pop(context);
-
-                                                      //Navigator.push(context, MaterialPageRoute(builder: (context) =>ScratchCards(phoneNumber:phonenumber  ,)));
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              ScratchCards(
-                                                            cID: cid!,
-                                                          ),
-                                                        ),
+                                                var response =
+                                                    await checkstry(instaPgId!);
+                                                if (response == 'error') {
+                                                  setState(() {
+                                                    error =
+                                                        'Post Story and Try Again';
+                                                    loading1 = false;
+                                                  });
+                                                  Navigator.pop(context);
+                                                } else {
+                                                  for (var i = 0;
+                                                      i <
+                                                          _getStory!
+                                                              .data!.length;
+                                                      i++) {
+                                                    try {
+                                                      RegExp exp = RegExp(
+                                                        caption,
+                                                        caseSensitive: false,
                                                       );
-                                                      //return goToDialog();
-                                                    } else {
+                                                      bool containe = exp
+                                                          .hasMatch(_getStory!
+                                                              .data![i]
+                                                              .caption!);
+                                                      print('in...');
+                                                      if (containe == true) {
+                                                        storyId.add(_getStory!
+                                                            .data![i].id!);
+                                                        // checkstryId(stry_id.toSet().toList(growable: true),widget.campaign_id);
+                                                      } else {
+                                                        setState(() {
+                                                          loading1 = false;
+                                                        });
+                                                        //Navigator.pop(context);
+                                                      }
+                                                    } catch (e) {
+                                                      // setState((){error='';});
                                                       setState(() {
-                                                        error =
-                                                            'Please Add Proper Story';
                                                         loading1 = false;
                                                       });
-                                                      // Navigator.pop(context);
+                                                      //Navigator.pop(context);
                                                     }
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                          },
+                                                    // if(_getStry.data[i].caption==caption){
+                                                    //   String id=_getStry.data[i].id;
+                                                    //   print(id.toString());
+                                                    //   Navigator.pop(context);
+                                                    //   Navigator.push(context, MaterialPageRoute(
+                                                    //       builder: (context) => ScratchCards()));
+                                                    //
+                                                    // }
+                                                    // else setState(() {error='Post Story with given Instruction';});
+                                                  }
+                                                }
+                                                var value = await checkstryId(
+                                                    storyId
+                                                        .toSet()
+                                                        .toList(growable: true),
+                                                    widget.id,
+                                                    widget.campaignId,
+                                                    customerId);
+                                                if (value == 200) {
+                                                  print('in dialog');
+                                                  setState(() {
+                                                    loading1 = false;
+                                                  });
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+
+                                                  //Navigator.push(context, MaterialPageRoute(builder: (context) =>ScratchCards(phoneNumber:phonenumber  ,)));
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ScratchCards(
+                                                        cID: cid!,
+                                                      ),
+                                                    ),
+                                                  );
+                                                  //return goToDialog();
+                                                } else {
+                                                  setState(() {
+                                                    error =
+                                                        'Please Add Proper Story';
+                                                    loading1 = false;
+                                                  });
+                                                  // Navigator.pop(context);
+                                                }
+                                              },
+                                            ),
+                                          ],
                                         );
                                       },
                                     );
-                                  }
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          );
-                        },
+                                  },
+                                );
+                              }
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
                       );
-                    } else {
-                      setState(() {
-                        error = 'Max story limit per day is One';
-                        loading1 = false;
-                      });
-                    }
-                  }
-                },
-                child: Center(
-                  child: Text(
-                    'Post a story',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                  ),
+                    },
+                  );
+                } else {
+                  setState(() {
+                    error = 'Max story limit per day is One';
+                    loading1 = false;
+                  });
+                }
+              }
+            },
+            child: Center(
+              child: Text(
+                'Post a story',
+                style: GoogleFonts.montserrat(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
                 ),
               ),
             ),
           ),
         ),
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 0, right: 0, top: 70),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding:
-                          const EdgeInsets.only(left: 40, right: 40, top: 0),
-                      alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: kPrimaryColor,
-                          size: 30,
-                        ),
+      ),
+      // ---------------------- Post Story Button END ---------------------------
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 0, right: 0, top: 70),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.only(left: 40, right: 40, top: 0),
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: kPrimaryColor,
+                        size: 30,
                       ),
                     ),
-                    Container(
-                      padding:
-                          const EdgeInsets.only(left: 40, right: 40, top: 0),
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const InstructionPost(),
-                              ),
-                            );
-                          },
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const InstructionPost()));
-                            },
-                            //color: Colors.orange,
-                            child: const Text(
-                              'Help',
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 40, right: 40, top: 0),
+                    alignment: Alignment.centerRight,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.transparent,
+                          elevation: 0,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const InstructionPost(),
                             ),
+                          );
+                        },
+                        child: const Text(
+                          'Help',
+                          style: TextStyle(
+                            color: kBlackColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    Image.asset('assets/logo.png', width: 46.31, height: 60),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Text(
-                        "${widget.brand} BRAND".toUpperCase(),
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: kTextColor[300],
-                        ),
+                  ),
+                  Image.asset('assets/logo.png', width: 46.31, height: 60),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      "${widget.brand} BRAND".toUpperCase(),
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: kTextColor[300],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.only(bottom: 100),
-                      height: 700,
-                      child: DefaultTabController(
-                        initialIndex: 0,
-                        length: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TabBar(
-                              unselectedLabelColor: Colors.grey,
-                              labelColor: kPrimaryColor,
-                              tabs: const [
-                                Tab(text: 'Photos'),
-                                Tab(text: 'Videos'),
-                              ],
-                              labelStyle: GoogleFonts.poppins(
-                                  fontSize: 13, fontWeight: FontWeight.w500),
-                              indicatorSize: TabBarIndicatorSize.label,
-                              indicatorColor: kSecondaryColor,
-                            ),
-                            Expanded(
-                              //height: 600,
-                              child: TabBarView(
-                                children: [
-                                  FutureBuilder(
-                                      future: getAvailableMedia(id: widget.id),
-                                      // stream: _postsController.stream,
-                                      builder:
-                                          (context, AsyncSnapshot snapshot) {
-                                        if (!snapshot.hasData) {
-                                          return const Center(
-                                              child:
-                                                  CircularProgressIndicator());
-                                        }
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.only(bottom: 100),
+                    height: 700,
+                    child: DefaultTabController(
+                      initialIndex: 0,
+                      length: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TabBar(
+                            unselectedLabelColor: Colors.grey,
+                            labelColor: kPrimaryColor,
+                            tabs: const [
+                              Tab(text: 'Photos'),
+                              Tab(text: 'Videos'),
+                            ],
+                            labelStyle: GoogleFonts.poppins(
+                                fontSize: 13, fontWeight: FontWeight.w500),
+                            indicatorSize: TabBarIndicatorSize.label,
+                            indicatorColor: kSecondaryColor,
+                          ),
+                          Expanded(
+                            //height: 600,
 
-                                        return ListView.builder(
-                                            shrinkWrap: true,
-                                            // physics: NeverScrollableScrollPhysics(),
-                                            itemCount: _getMedia!.media!.length,
-                                            itemBuilder:
-                                                (BuildContext ctx, index) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    selected =
-                                                        "${_getMedia!.media![index].src}";
-                                                    mediaType =
-                                                        "${_getMedia!.media![index].type}";
-                                                    choice = index;
-                                                    error = '';
-                                                  });
-                                                },
-                                                child: _getMedia!.media![index]
-                                                            .type ==
-                                                        'image'
-                                                    ? Container(
-                                                        margin: const EdgeInsets
-                                                                .fromLTRB(
-                                                            35, 0, 35, 0),
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                            Radius.circular(10),
-                                                          ),
-                                                        ),
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                bottom: 5),
-                                                        alignment:
-                                                            Alignment.center,
-                                                        child: Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                            border: Border.all(
-                                                              color: selected ==
-                                                                      "${_getMedia!.media![index].src}"
-                                                                  ? kBlackColor
-                                                                  : kWhiteColor,
-                                                            ),
-                                                          ),
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8),
-                                                          child:
-                                                              CachedNetworkImage(
-                                                            imageUrl:
-                                                                "${_getMedia!.media![index].src}",
-                                                            progressIndicatorBuilder: (context,
-                                                                    url,
-                                                                    downloadProgress) =>
-                                                                CircularProgressIndicator(
-                                                                    value: downloadProgress
-                                                                        .progress),
-                                                            errorWidget: (context,
-                                                                    url,
-                                                                    error) =>
-                                                                const Icon(Icons
-                                                                    .error),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : Container(
-                                                        height: 0,
+                            // -------------------------- Photos List -------------------------
+                            child: TabBarView(
+                              children: [
+                                FutureBuilder(
+                                  future: getAvailableMedia(id: widget.id),
+                                  // stream: _postsController.stream,
+                                  builder: (context, AsyncSnapshot snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    }
+
+                                    return ListView.builder(
+                                      shrinkWrap: true,
+                                      // physics: NeverScrollableScrollPhysics(),
+                                      itemCount: _getMedia!.media!.length,
+                                      itemBuilder: (BuildContext ctx, index) {
+                                        return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                print(
+                                                    "Image OnTap --> ${_getMedia!.media![index].src}");
+                                                selected =
+                                                    "${_getMedia!.media![index].src}";
+                                                mediaType =
+                                                    "${_getMedia!.media![index].type}";
+                                                choice = index;
+                                                error = '';
+                                              });
+                                            },
+                                            child: _getMedia!
+                                                        .media![index].type ==
+                                                    'image'
+                                                ? Container(
+                                                    margin: const EdgeInsets
+                                                        .fromLTRB(35, 0, 35, 0),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                        Radius.circular(10),
                                                       ),
-                                              );
-                                            });
-
-                                        //return Container();
-                                      }),
-
-                                  // Text('testing'),
-                                  FutureBuilder(
-                                    future: getAvailableMedia(id: widget.id),
-                                    builder: (context, AsyncSnapshot snapshot) {
-                                      if (!snapshot.hasData) {
-                                        return const Center(
-                                            child: CircularProgressIndicator());
-                                      }
-
-                                      return ListView.builder(
-                                        shrinkWrap: true,
-                                        // physics: NeverScrollableScrollPhysics(),
-                                        itemCount: _getMedia!.media!.length,
-                                        itemBuilder: (BuildContext ctx, index) {
-                                          return GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  selected =
-                                                      "${_getMedia!.media![index].src}";
-                                                  mediaType =
-                                                      "${_getMedia!.media![index].type}";
-                                                  choice = index;
-                                                  error = '';
-                                                });
-                                              },
-                                              child: _getMedia!
-                                                          .media![index].type ==
-                                                      'video'
-                                                  ? Container(
-                                                      margin: const EdgeInsets
-                                                              .fromLTRB(
-                                                          35, 0, 35, 0),
-                                                      decoration:
-                                                          const BoxDecoration(
+                                                    ),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            bottom: 5),
+                                                    alignment: Alignment.center,
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
                                                         borderRadius:
-                                                            BorderRadius.all(
-                                                          Radius.circular(10),
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        border: Border.all(
+                                                          color: selected ==
+                                                                  "${_getMedia!.media![index].src}"
+                                                              ? kBlackColor
+                                                              : Colors
+                                                                  .transparent,
                                                         ),
                                                       ),
                                                       padding:
-                                                          const EdgeInsets.only(
-                                                              bottom: 5),
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: Colors
-                                                              .transparent,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(5),
-                                                          border: Border.all(
-                                                            color: selected ==
-                                                                    "${_getMedia!.media![index].src}"
-                                                                ? kBlackColor
-                                                                : kWhiteColor,
-                                                          ),
-                                                        ),
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(0),
-                                                        child: VideoWidget(
-                                                          play: true,
-                                                          url:
-                                                              '${_getMedia!.media![index].src}',
-                                                          selected: selected,
-                                                        ),
+                                                          const EdgeInsets.all(
+                                                              8),
+                                                      child: CachedNetworkImage(
+                                                        imageUrl:
+                                                            "${_getMedia!.media![index].src}",
+                                                        progressIndicatorBuilder: (context,
+                                                                url,
+                                                                downloadProgress) =>
+                                                            CircularProgressIndicator(
+                                                                value: downloadProgress
+                                                                    .progress),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            const Icon(
+                                                                Icons.error),
                                                       ),
-                                                    )
-                                                  : Container(
-                                                      height: 0,
-                                                    ));
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                                                    ),
+                                                  )
+                                                : const SizedBox.shrink());
+                                      },
+                                    );
+                                  },
+                                ),
+
+                                // -------------------------- Videos List -------------------------
+                                FutureBuilder(
+                                  future: getAvailableMedia(id: widget.id),
+                                  builder: (context, AsyncSnapshot snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    }
+
+                                    return ListView.builder(
+                                      shrinkWrap: true,
+                                      // physics: NeverScrollableScrollPhysics(),
+                                      itemCount: _getMedia!.media!.length,
+                                      itemBuilder: (BuildContext ctx, index) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              print(
+                                                  "Video onTap --> ${_getMedia!.media![index].src}");
+                                              selected =
+                                                  "${_getMedia!.media![index].src}";
+                                              mediaType =
+                                                  "${_getMedia!.media![index].type}";
+                                              choice = index;
+                                              error = '';
+                                            });
+                                          },
+                                          child: _getMedia!
+                                                      .media![index].type ==
+                                                  'video'
+                                              ? Container(
+                                                  margin: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 35),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                      Radius.circular(10),
+                                                    ),
+                                                    border: Border.all(
+                                                      color: selected ==
+                                                              "${_getMedia!.media![index].src}"
+                                                          ? kBlackColor
+                                                          : Colors.transparent,
+                                                    ),
+                                                  ),
+                                                  alignment: Alignment.center,
+                                                  child: VideoWidget(
+                                                    play: true,
+                                                    url:
+                                                        '${_getMedia!.media![index].src}',
+                                                    selected: selected,
+                                                  ),
+                                                )
+                                              : const SizedBox.shrink(),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
+          ),
 
-            Center(
-              child: Container(
-                // height: MediaQuery.of(context).size.height,
-                margin: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height - 100),
-                child: Text(
-                  error,
-                  style: const TextStyle(
-                      fontSize: 17,
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold),
-                ),
+          Center(
+            child: Container(
+              // height: MediaQuery.of(context).size.height,
+              margin: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height - 100),
+              child: Text(
+                error,
+                style: const TextStyle(
+                    fontSize: 17,
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold),
               ),
             ),
-            // loading==true?FutureBuilder(
-            //      future: checkstry(),
-            //      builder: (context, AsyncSnapshot snapshot){
-            //        if(!snapshot.hasData){
-            //          return Padding(
-            //            padding: const EdgeInsets.only(top: 300),
-            //            child:  Center(child: Text('post story')),
-            //          );
-            //        }
-            //       else
-            //        for(var i=0;i<_getStry.data.length;i++){
-            //          print(_getStry.data.length.toString());
-            //
-            //          if(_getStry.data[i].caption=='#nearlikes'){
-            //            String id=_getStry.data[i].id;
-            //            //count=count+1;
-            //            print(id);
-            //            return Padding(
-            //              padding: const EdgeInsets.only(top: 300),
-            //              child: Center(child: Text('story posted successfully')),
-            //            );
-            //          }
-            //        }
-            //        setState(() {
-            //          loading==false;
-            //        });
-            //        return Text('Error');
-            //
-            //      }):Container(height: 0,)
+          ),
+          // loading==true?FutureBuilder(
+          //      future: checkstry(),
+          //      builder: (context, AsyncSnapshot snapshot){
+          //        if(!snapshot.hasData){
+          //          return Padding(
+          //            padding: const EdgeInsets.only(top: 300),
+          //            child:  Center(child: Text('post story')),
+          //          );
+          //        }
+          //       else
+          //        for(var i=0;i<_getStry.data.length;i++){
+          //          print(_getStry.data.length.toString());
+          //
+          //          if(_getStry.data[i].caption=='#nearlikes'){
+          //            String id=_getStry.data[i].id;
+          //            //count=count+1;
+          //            print(id);
+          //            return Padding(
+          //              padding: const EdgeInsets.only(top: 300),
+          //              child: Center(child: Text('story posted successfully')),
+          //            );
+          //          }
+          //        }
+          //        setState(() {
+          //          loading==false;
+          //        });
+          //        return Text('Error');
+          //
+          //      }):Container(height: 0,)
 
-            loading1 == true
-                ? Container(
-                    alignment: Alignment.bottomCenter,
-                    child: CircularProgressIndicator(
-                      color: Colors.red,
-                    ),
-                    padding: EdgeInsets.only(bottom: 30),
-                  )
-                : Container(height: 0)
-          ],
-        ));
+          loading1 == true
+              ? Container(
+                  alignment: Alignment.bottomCenter,
+                  child: const CircularProgressIndicator(
+                    color: Colors.red,
+                  ),
+                  padding: const EdgeInsets.only(bottom: 30),
+                )
+              : Container(height: 0)
+        ],
+      ),
+    );
   }
 
   goToDialog() {
@@ -943,7 +902,7 @@ class _BrandStoriesState extends State<BrandStories> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         GestureDetector(
@@ -959,7 +918,7 @@ class _BrandStoriesState extends State<BrandStories> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 5.0,
                         ),
                         Text(
@@ -970,7 +929,7 @@ class _BrandStoriesState extends State<BrandStories> {
                             color: kTextColor[300],
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 18,
                         ),
                         // InkWell(
@@ -1020,7 +979,7 @@ class _BrandStoriesState extends State<BrandStories> {
                               child: Container(
                                 padding: const EdgeInsets.all(16.0),
                                 decoration: BoxDecoration(
-                                  boxShadow: [
+                                  boxShadow: const [
                                     BoxShadow(
                                         color: Colors.white,
                                         blurRadius: 10,
@@ -1168,27 +1127,20 @@ class _VideoWidgetState extends State<VideoWidget> {
             onTap: () {
               _controller.play();
             },
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      child: AspectRatio(
-                        aspectRatio: _controller.value.aspectRatio,
-                        child: VideoPlayer(_controller),
-                      )
-                      // videoinit==false? Image.network("${_getMedia.media[index].pre}",fit: BoxFit.fitWidth): AspectRatio(
-                      //   aspectRatio: _controller.value.aspectRatio,
-                      //   child: VideoPlayer(_controller),
-                      // ),
-                      ),
+            child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ],
-            ),
+                padding: const EdgeInsets.all(8),
+                child: AspectRatio(
+                  aspectRatio: _controller.value.aspectRatio,
+                  child: VideoPlayer(_controller),
+                )
+                // videoinit==false? Image.network("${_getMedia.media[index].pre}",fit: BoxFit.fitWidth): AspectRatio(
+                //   aspectRatio: _controller.value.aspectRatio,
+                //   child: VideoPlayer(_controller),
+                // ),
+                ),
           );
         } else {
           return const Center(
