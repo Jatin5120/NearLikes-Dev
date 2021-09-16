@@ -1172,6 +1172,7 @@ class _VideoWidgetState extends State<VideoWidget> {
           return GestureDetector(
             onTap: () {
               storyController.isStorySelected = true;
+              storyController.storyUrl = widget.url;
               storyController.selectedIndex = widget.index;
               _controller.play();
             },

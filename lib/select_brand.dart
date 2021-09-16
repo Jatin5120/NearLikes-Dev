@@ -70,12 +70,16 @@ class SelectBrand extends StatelessWidget {
               ),
               FutureBuilder(
                 future: getAvailableCampaigns(
-                    followers: 500, location: "kolkata", age: 40),
+                  followers: 500,
+                  location: "kolkata",
+                  age: 40,
+                ),
                 builder: (context, AsyncSnapshot snapshot) {
                   if (!snapshot.hasData) {
                     print(snapshot.data);
                     return const Center(child: CircularProgressIndicator());
                   }
+                  print("Data recieved");
                   print(snapshot.data);
                   return GridView.builder(
                     shrinkWrap: true,
@@ -87,28 +91,28 @@ class SelectBrand extends StatelessWidget {
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 20,
                     ),
-                    itemCount: _getCampaigns?.campaigns!.length ?? 1,
+                    itemCount: _getCampaigns?.campaigns!.length,
                     itemBuilder: (BuildContext ctx, index) {
                       return InkWell(
                         splashColor: Colors.transparent,
                         hoverColor: Colors.transparent,
                         onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  final Campaign campaign =
-                                      _getCampaigns!.campaigns![index];
-                                  return BrandStories(
-                                    brand: campaign.brand!,
-                                    id: campaign.ownerId!,
-                                    campaignId: campaign.id!,
-                                    brandMoto: campaign.text!,
-                                  );
-                                },
-                              ),
-                            );
-                          },
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                final Campaign campaign =
+                                    _getCampaigns!.campaigns![index];
+                                return BrandStories(
+                                  brand: campaign.brand!,
+                                  id: campaign.ownerId!,
+                                  campaignId: campaign.id!,
+                                  brandMoto: campaign.text!,
+                                );
+                              },
+                            ),
+                          );
+                        },
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
                           child: Container(

@@ -186,9 +186,9 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> addPlayer(String? customerId) async {
     print('Inside AddPlayer');
-    final OSDeviceState status =
-        await (OneSignal.shared.getDeviceState() as FutureOr<OSDeviceState>);
-    final String osUserID = status.userId!;
+    //TODO: changed right side of line below
+    final OSDeviceState? status = await OneSignal.shared.getDeviceState();
+    final String osUserID = status!.userId!;
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs
@@ -312,7 +312,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisSpacing: size.width.fivePercent,
                         mainAxisSpacing: size.width.fivePercent,
                       ),
-                      itemCount: _getCampaigns?.campaigns!.length ?? 1,
+                      itemCount: _getCampaigns?.campaigns!.length ?? 0,
                       itemBuilder: (_, index) {
                         return GestureDetector(
                           onTap: () {
