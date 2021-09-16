@@ -37,6 +37,7 @@ dependencies:
   flutter_svg: ^0.22.0
   geocoding: ^2.0.1
   geolocator: ^7.6.0
+  get: ^4.3.8
   google_fonts: ^2.1.0
   google_maps_place_picker: ^2.1.0-nullsafety.3
   image_picker: ^0.8.4
@@ -53,10 +54,9 @@ dependencies:
   youtube_player_flutter: ^8.0.0
 
 dev_dependencies:
+  flutter_lints: ^1.0.0
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^1.0.0
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter.

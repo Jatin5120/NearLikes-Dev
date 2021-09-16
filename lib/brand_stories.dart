@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:confetti/confetti.dart';
+import 'package:get/get.dart';
 import 'package:nearlikes/instruction_post.dart';
 import 'package:scratcher/widgets.dart';
 import 'package:nearlikes/models/checkaddedstry.dart';
@@ -24,6 +25,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:instagram_share/instagram_share.dart';
 
 import 'constants/constants.dart';
+import 'controllers/controllers.dart';
 
 GetMedia? _getMedia;
 GetStry? _getStory;
@@ -33,7 +35,6 @@ String? instaPgId;
 String? cid;
 bool loading1 = false;
 bool videoinit = false;
-String selected = "";
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 String? mediaType;
@@ -196,8 +197,9 @@ Future<String?> addStory(String url) async {
 }
 
 class _BrandStoriesState extends State<BrandStories> {
+  static StoryController storyController = Get.find();
+
   int count = 0;
-  String error = '';
   var response;
   String caption = '#nearlikes';
 
@@ -348,202 +350,216 @@ class _BrandStoriesState extends State<BrandStories> {
             ),
           ],
         ),
-        child: Container(
-          height: 40,
-          width: 185,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: selected == "" ? Colors.grey : null,
-            gradient: selected != ""
-                ? const LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                    colors: [kSecondaryColor, kPrimaryColor],
-                  )
-                : null,
-          ),
-          child: InkWell(
-            onTap: () async {
-              if (selected != "") {
-                setState(() {
-                  error = '';
-                });
-                int statusCode = await checkMaxStry();
-                print('the maxstry is $statusCode');
-                if (statusCode == 200) {
-                  return showDialog(
-                    context: _scaffoldKey.currentContext!,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text(widget.brand),
-                        content: Text(
-                          '${widget.brandMoto.toString()} \n Note: Add #nearlikes to your story',
-                        ),
-                        actions: [
-                          // Expanded(child: Text('Note: Add #nearlikes to your story',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)),
-                          ElevatedButton(
-                            child: const Text('Cancel'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          ElevatedButton(
-                            child: const Text('Ok'),
-                            onPressed: () async {
-                              setState(() {
-                                loading1 = true;
-                              });
-                              String? response = await addStory(selected);
-                              print('the response is $response');
-                              if (response == 'success') {
-                                // setState(() {
-                                //   loading1=false;
-                                // });
-                                //setState(() {loading=true;});
-                                _mockCheckForSession(mediaType).then(
-                                  (value) {
-                                    return showDialog(
-                                      context: _scaffoldKey.currentContext!,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          title:
-                                              const Text('Checking your Story'),
-                                          content: const Text(
-                                              'Have you posted Instagram Story?'),
-                                          actions: <Widget>[
-                                            ElevatedButton(
-                                              child: const Text('No'),
-                                              onPressed: () {
-                                                print('//b hello //b');
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                            ElevatedButton(
-                                              child: const Text('Yes'),
-                                              onPressed: () async {
-                                                setState(() {
-                                                  loading1 = true;
-                                                });
+        child: Obx(
+          () => Container(
+            height: 40,
+            width: 185,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: storyController.isStorySelected ? null : Colors.grey,
+              gradient: storyController.isStorySelected
+                  ? const LinearGradient(
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                      colors: [kSecondaryColor, kPrimaryColor],
+                    )
+                  : null,
+              // color: selected == "" ? Colors.grey : null,
+              // gradient: selected != ""
+              //     ? const LinearGradient(
+              //         begin: Alignment.topRight,
+              //         end: Alignment.bottomLeft,
+              //         colors: [kSecondaryColor, kPrimaryColor],
+              //       )
+              //     : null,
+            ),
+            child: InkWell(
+              onTap: () async {
+                if (storyController.isStorySelected) {
+                  storyController.error = '';
 
-                                                var response =
-                                                    await checkstry(instaPgId!);
-                                                if (response == 'error') {
-                                                  setState(() {
-                                                    error =
-                                                        'Post Story and Try Again';
-                                                    loading1 = false;
-                                                  });
+                  int statusCode = await checkMaxStry();
+
+                  print('the maxstry is $statusCode');
+
+                  if (statusCode == 200) {
+                    return showDialog(
+                      context: _scaffoldKey.currentContext!,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text(widget.brand),
+                          content: Text(
+                            '${widget.brandMoto.toString()} \n Note: Add #nearlikes to your story',
+                          ),
+                          actions: [
+                            // Expanded(child: Text('Note: Add #nearlikes to your story',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)),
+                            ElevatedButton(
+                              child: const Text('Cancel'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ElevatedButton(
+                              child: const Text('Ok'),
+                              onPressed: () async {
+                                setState(() {
+                                  loading1 = true;
+                                });
+                                print(
+                                    "Ok pressed --> ${storyController.storyUrl}");
+                                String? response =
+                                    await addStory(storyController.storyUrl);
+                                print('the response is $response');
+                                if (response == 'success') {
+                                  // setState(() {
+                                  //   loading1=false;
+                                  // });
+                                  //setState(() {loading=true;});
+                                  _mockCheckForSession(mediaType).then(
+                                    (value) {
+                                      return showDialog(
+                                        context: _scaffoldKey.currentContext!,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: const Text(
+                                                'Checking your Story'),
+                                            content: const Text(
+                                                'Have you posted Instagram Story?'),
+                                            actions: <Widget>[
+                                              ElevatedButton(
+                                                child: const Text('No'),
+                                                onPressed: () {
+                                                  print('//b hello //b');
                                                   Navigator.pop(context);
-                                                } else {
-                                                  for (var i = 0;
-                                                      i <
-                                                          _getStory!
-                                                              .data!.length;
-                                                      i++) {
-                                                    try {
-                                                      RegExp exp = RegExp(
-                                                        caption,
-                                                        caseSensitive: false,
-                                                      );
-                                                      bool containe = exp
-                                                          .hasMatch(_getStory!
-                                                              .data![i]
-                                                              .caption!);
-                                                      print('in...');
-                                                      if (containe == true) {
-                                                        storyId.add(_getStory!
-                                                            .data![i].id!);
-                                                        // checkstryId(stry_id.toSet().toList(growable: true),widget.campaign_id);
-                                                      } else {
+                                                },
+                                              ),
+                                              ElevatedButton(
+                                                child: const Text('Yes'),
+                                                onPressed: () async {
+                                                  setState(() {
+                                                    loading1 = true;
+                                                  });
+
+                                                  var response =
+                                                      await checkstry(
+                                                          instaPgId!);
+                                                  if (response == 'error') {
+                                                    storyController.error =
+                                                        'Post Story and Try Again';
+                                                    setState(() {
+                                                      loading1 = false;
+                                                    });
+                                                    Navigator.pop(context);
+                                                  } else {
+                                                    for (var i = 0;
+                                                        i <
+                                                            _getStory!
+                                                                .data!.length;
+                                                        i++) {
+                                                      try {
+                                                        RegExp exp = RegExp(
+                                                          caption,
+                                                          caseSensitive: false,
+                                                        );
+                                                        bool containe = exp
+                                                            .hasMatch(_getStory!
+                                                                .data![i]
+                                                                .caption!);
+                                                        print('in...');
+                                                        if (containe == true) {
+                                                          storyId.add(_getStory!
+                                                              .data![i].id!);
+                                                          // checkstryId(stry_id.toSet().toList(growable: true),widget.campaign_id);
+                                                        } else {
+                                                          setState(() {
+                                                            loading1 = false;
+                                                          });
+                                                          //Navigator.pop(context);
+                                                        }
+                                                      } catch (e) {
+                                                        // setState((){error='';});
                                                         setState(() {
                                                           loading1 = false;
                                                         });
                                                         //Navigator.pop(context);
                                                       }
-                                                    } catch (e) {
-                                                      // setState((){error='';});
-                                                      setState(() {
-                                                        loading1 = false;
-                                                      });
-                                                      //Navigator.pop(context);
+                                                      // if(_getStry.data[i].caption==caption){
+                                                      //   String id=_getStry.data[i].id;
+                                                      //   print(id.toString());
+                                                      //   Navigator.pop(context);
+                                                      //   Navigator.push(context, MaterialPageRoute(
+                                                      //       builder: (context) => ScratchCards()));
+                                                      //
+                                                      // }
+                                                      // else setState(() {error='Post Story with given Instruction';});
                                                     }
-                                                    // if(_getStry.data[i].caption==caption){
-                                                    //   String id=_getStry.data[i].id;
-                                                    //   print(id.toString());
-                                                    //   Navigator.pop(context);
-                                                    //   Navigator.push(context, MaterialPageRoute(
-                                                    //       builder: (context) => ScratchCards()));
-                                                    //
-                                                    // }
-                                                    // else setState(() {error='Post Story with given Instruction';});
                                                   }
-                                                }
-                                                var value = await checkstryId(
-                                                    storyId
-                                                        .toSet()
-                                                        .toList(growable: true),
-                                                    widget.id,
-                                                    widget.campaignId,
-                                                    customerId);
-                                                if (value == 200) {
-                                                  print('in dialog');
-                                                  setState(() {
-                                                    loading1 = false;
-                                                  });
-                                                  Navigator.pop(context);
-                                                  Navigator.pop(context);
-                                                  Navigator.pop(context);
+                                                  var value = await checkstryId(
+                                                      storyId.toSet().toList(
+                                                          growable: true),
+                                                      widget.id,
+                                                      widget.campaignId,
+                                                      customerId);
+                                                  if (value == 200) {
+                                                    print('in dialog');
+                                                    setState(() {
+                                                      loading1 = false;
+                                                    });
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context);
 
-                                                  //Navigator.push(context, MaterialPageRoute(builder: (context) =>ScratchCards(phoneNumber:phonenumber  ,)));
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ScratchCards(
-                                                        cID: cid!,
+                                                    //Navigator.push(context, MaterialPageRoute(builder: (context) =>ScratchCards(phoneNumber:phonenumber  ,)));
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ScratchCards(
+                                                          cID: cid!,
+                                                        ),
                                                       ),
-                                                    ),
-                                                  );
-                                                  //return goToDialog();
-                                                } else {
-                                                  setState(() {
-                                                    error =
+                                                    );
+                                                    //return goToDialog();
+                                                  } else {
+                                                    storyController.error =
                                                         'Please Add Proper Story';
-                                                    loading1 = false;
-                                                  });
-                                                  // Navigator.pop(context);
-                                                }
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              }
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  setState(() {
-                    error = 'Max story limit per day is One';
-                    loading1 = false;
-                  });
+                                                    setState(() {
+                                                      loading1 = false;
+                                                    });
+                                                    // Navigator.pop(context);
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
+                                }
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    storyController.error = 'Max story limit per day is One';
+                    setState(() {
+                      loading1 = false;
+                    });
+                  }
                 }
-              }
-            },
-            child: Center(
-              child: Text(
-                'Post a story',
-                style: GoogleFonts.montserrat(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
+              },
+              child: Center(
+                child: Text(
+                  'Post a story',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -637,6 +653,10 @@ class _BrandStoriesState extends State<BrandStories> {
                                 fontSize: 13, fontWeight: FontWeight.w500),
                             indicatorSize: TabBarIndicatorSize.label,
                             indicatorColor: kSecondaryColor,
+                            isScrollable: false,
+                            onTap: (index) {
+                              storyController.isStorySelected = false;
+                            },
                           ),
                           Expanded(
                             //height: 600,
@@ -657,18 +677,24 @@ class _BrandStoriesState extends State<BrandStories> {
                                       shrinkWrap: true,
                                       // physics: NeverScrollableScrollPhysics(),
                                       itemCount: _getMedia!.media!.length,
-                                      itemBuilder: (BuildContext ctx, index) {
+                                      itemBuilder: (_, index) {
                                         return GestureDetector(
                                             onTap: () {
+                                              storyController.error = '';
+                                              storyController.storyUrl =
+                                                  "${_getMedia!.media![index].src}";
+                                              storyController.isStorySelected =
+                                                  true;
+                                              storyController.selectedIndex =
+                                                  index;
+
                                               setState(() {
                                                 print(
                                                     "Image OnTap --> ${_getMedia!.media![index].src}");
-                                                selected =
-                                                    "${_getMedia!.media![index].src}";
+
                                                 mediaType =
                                                     "${_getMedia!.media![index].type}";
                                                 choice = index;
-                                                error = '';
                                               });
                                             },
                                             child: _getMedia!
@@ -688,35 +714,42 @@ class _BrandStoriesState extends State<BrandStories> {
                                                         const EdgeInsets.only(
                                                             bottom: 5),
                                                     alignment: Alignment.center,
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                        border: Border.all(
-                                                          color: selected ==
-                                                                  "${_getMedia!.media![index].src}"
-                                                              ? kBlackColor
-                                                              : Colors
-                                                                  .transparent,
+                                                    child: Obx(
+                                                      () => Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                          border: Border.all(
+                                                            color: storyController
+                                                                        .isStorySelected &&
+                                                                    storyController
+                                                                            .selectedIndex ==
+                                                                        index
+                                                                ? kBlackColor
+                                                                : Colors
+                                                                    .transparent,
+                                                          ),
                                                         ),
-                                                      ),
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8),
-                                                      child: CachedNetworkImage(
-                                                        imageUrl:
-                                                            "${_getMedia!.media![index].src}",
-                                                        progressIndicatorBuilder: (context,
-                                                                url,
-                                                                downloadProgress) =>
-                                                            CircularProgressIndicator(
-                                                                value: downloadProgress
-                                                                    .progress),
-                                                        errorWidget: (context,
-                                                                url, error) =>
-                                                            const Icon(
-                                                                Icons.error),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8),
+                                                        child:
+                                                            CachedNetworkImage(
+                                                          imageUrl:
+                                                              "${_getMedia!.media![index].src}",
+                                                          progressIndicatorBuilder: (context,
+                                                                  url,
+                                                                  downloadProgress) =>
+                                                              CircularProgressIndicator(
+                                                                  value: downloadProgress
+                                                                      .progress),
+                                                          errorWidget: (context,
+                                                                  url, error) =>
+                                                              const Icon(
+                                                                  Icons.error),
+                                                        ),
                                                       ),
                                                     ),
                                                   )
@@ -742,42 +775,50 @@ class _BrandStoriesState extends State<BrandStories> {
                                       itemBuilder: (BuildContext ctx, index) {
                                         return GestureDetector(
                                           onTap: () {
+                                            storyController.storyUrl =
+                                                "${_getMedia!.media![index].src}";
+                                            storyController.error = '';
                                             setState(() {
                                               print(
                                                   "Video onTap --> ${_getMedia!.media![index].src}");
-                                              selected =
-                                                  "${_getMedia!.media![index].src}";
+
                                               mediaType =
                                                   "${_getMedia!.media![index].type}";
                                               choice = index;
-                                              error = '';
                                             });
                                           },
                                           child: _getMedia!
                                                       .media![index].type ==
                                                   'video'
-                                              ? Container(
-                                                  margin: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 35),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        const BorderRadius.all(
-                                                      Radius.circular(10),
+                                              ? Obx(
+                                                  () => Container(
+                                                    margin: const EdgeInsets
+                                                            .symmetric(
+                                                        horizontal: 35),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .all(
+                                                        Radius.circular(10),
+                                                      ),
+                                                      border: Border.all(
+                                                        color: storyController
+                                                                    .isStorySelected &&
+                                                                storyController
+                                                                        .selectedIndex ==
+                                                                    index
+                                                            ? kBlackColor
+                                                            : Colors
+                                                                .transparent,
+                                                      ),
                                                     ),
-                                                    border: Border.all(
-                                                      color: selected ==
-                                                              "${_getMedia!.media![index].src}"
-                                                          ? kBlackColor
-                                                          : Colors.transparent,
+                                                    alignment: Alignment.center,
+                                                    child: VideoWidget(
+                                                      index: index,
+                                                      play: true,
+                                                      url:
+                                                          '${_getMedia!.media![index].src}',
                                                     ),
-                                                  ),
-                                                  alignment: Alignment.center,
-                                                  child: VideoWidget(
-                                                    play: true,
-                                                    url:
-                                                        '${_getMedia!.media![index].src}',
-                                                    selected: selected,
                                                   ),
                                                 )
                                               : const SizedBox.shrink(),
@@ -803,12 +844,14 @@ class _BrandStoriesState extends State<BrandStories> {
               // height: MediaQuery.of(context).size.height,
               margin: EdgeInsets.only(
                   top: MediaQuery.of(context).size.height - 100),
-              child: Text(
-                error,
-                style: const TextStyle(
-                    fontSize: 17,
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold),
+              child: Obx(
+                () => Text(
+                  storyController.error,
+                  style: const TextStyle(
+                      fontSize: 17,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ),
@@ -981,22 +1024,23 @@ class _BrandStoriesState extends State<BrandStories> {
                                 decoration: BoxDecoration(
                                   boxShadow: const [
                                     BoxShadow(
-                                        color: Colors.white,
-                                        blurRadius: 10,
-                                        spreadRadius: 0,
-                                        offset: Offset(0, 0))
+                                      color: Colors.white,
+                                      blurRadius: 10,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 0),
+                                    ),
                                   ],
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: ScratchCardW(
-                                    value: cashback, docId: "ddd", uId: "dddd"),
+                                  value: cashback,
+                                  docId: "ddd",
+                                  uId: "dddd",
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        // ScratchCardView(
-                        //                                           value: paidAmount.round(), docId: docId, uId: userId
-                        //                                             ),
                       ],
                     ),
                   ],
@@ -1036,7 +1080,7 @@ class _ScratchCardWState extends State<ScratchCardW> {
       color: Colors.greenAccent.shade700,
       image: Image.asset("assets/scratchcard.png"),
       child: AnimatedOpacity(
-        duration: Duration(milliseconds: 250),
+        duration: const Duration(milliseconds: 250),
         opacity: _opacity,
         child: Container(
           alignment: Alignment.center,
@@ -1082,13 +1126,13 @@ class _ScratchCardWState extends State<ScratchCardW> {
 class VideoWidget extends StatefulWidget {
   final bool play;
   final String url;
-  final String selected;
+  final int index;
 
   const VideoWidget({
     Key? key,
     required this.url,
     required this.play,
-    required this.selected,
+    required this.index,
   }) : super(key: key);
 
   @override
@@ -1098,6 +1142,8 @@ class VideoWidget extends StatefulWidget {
 class _VideoWidgetState extends State<VideoWidget> {
   late VideoPlayerController _controller;
   late Future<void> _initializeVideoPlayerFuture;
+
+  static StoryController storyController = Get.find();
 
   @override
   void initState() {
@@ -1125,6 +1171,8 @@ class _VideoWidgetState extends State<VideoWidget> {
         if (snapshot.connectionState == ConnectionState.done) {
           return GestureDetector(
             onTap: () {
+              storyController.isStorySelected = true;
+              storyController.selectedIndex = widget.index;
               _controller.play();
             },
             child: Container(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:nearlikes/brand_stories.dart';
+import 'package:nearlikes/controllers/controllers.dart';
 import 'package:nearlikes/onboarding.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
@@ -13,10 +15,16 @@ void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
   // await Firebase.initializeApp();
   globals.appNaviagtor = GlobalKey<NavigatorState>();
-  runApp(MaterialApp(
-      navigatorKey: globals.appNaviagtor,
-      debugShowCheckedModeBanner: false,
-      home: const Nearlikes()));
+  initializeControllers();
+  runApp(GetMaterialApp(
+    navigatorKey: globals.appNaviagtor,
+    debugShowCheckedModeBanner: false,
+    home: const Nearlikes(),
+  ));
+}
+
+initializeControllers() {
+  Get.lazyPut(() => StoryController());
 }
 
 class Nearlikes extends StatefulWidget {
