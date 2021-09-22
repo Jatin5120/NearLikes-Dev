@@ -44,7 +44,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<GetCampaigns?> getAvailableCampaigns(
       {int? followers, String? location, int? age}) async {
-    print("data..");
     const String apiUrl = "https://nearlikes.com/v1/api/campaign/get/campaigns";
     final Map<String, dynamic> body = {
       "followers": followers,
@@ -299,10 +298,8 @@ class _HomePageState extends State<HomePage> {
                       followers: 500, location: "kolkata", age: 40),
                   builder: (context, AsyncSnapshot snapshot) {
                     if (!snapshot.hasData) {
-                      print(snapshot.data);
                       return const Center(child: CircularProgressIndicator());
                     }
-                    print(snapshot.data);
                     return GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),

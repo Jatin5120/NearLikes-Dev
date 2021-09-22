@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:confetti/confetti.dart';
 import 'package:get/get.dart';
 import 'package:nearlikes/instruction_post.dart';
+import 'package:nearlikes/widgets/loading_dialog.dart';
 import 'package:scratcher/widgets.dart';
 import 'package:nearlikes/models/checkaddedstry.dart';
 import 'package:nearlikes/scratch_cards.dart';
@@ -62,7 +63,7 @@ var cashback;
 StreamController? _postsController;
 
 Future<GetMedia?> getAvailableMedia({required String id}) async {
-  print('inside get media');
+  // print('inside get media');
 
   const String apiUrl = "https://nearlikes.com/v1/api/client/get/media";
   var body = {
@@ -76,7 +77,7 @@ Future<GetMedia?> getAvailableMedia({required String id}) async {
 
   final String responseString = response.body;
   _getMedia = getMediaFromJson(responseString);
-  print('getAvailableMedia --> $responseString');
+  print('getAvailableMedia --> ${_getMedia.toString()}');
 
   return _getMedia;
 }
@@ -88,35 +89,47 @@ loadPosts(var id) async {
   });
 }
 
-checkstry(String instapgid) async {
+Future<dynamic> checkstry(String instapgid) async {
   print('inside checkstry the id is $instapgid');
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   String accesstoken = prefs.getString('token')!;
-  print('the access toke is $accesstoken');
+
   final String api =
       "https://graph.facebook.com/v11.0/$instapgid/stories?fields=media_url,timestamp,caption&access_token=$accesstoken";
 
-  var response = await http.get(Uri.parse(api));
-  //print(response.body);
+  http.Response response = await http.get(Uri.parse(api));
+
   final String responseString = response.body;
-  print('the body of fb story response is ${response.body}');
 
   try {
     _getStory = getStryFromJson(responseString);
-    print('this is checkstry func');
-    print('[][][][]');
-    print(_getStory!.data![0].id);
-    print(_getStory.toString());
     return _getStory;
+  } on SocketException {
+    print("No Internet Connection");
   } catch (e) {
     print(e.toString());
     return 'error';
   }
 }
 
+bool isValidStoryTime(Datum data) {
+  final StoryController storyController = Get.find();
+  storyController.endTime = DateTime.now();
+  DateTime postTime = DateTime.parse(data.timestamp!).toLocal();
+  print(storyController.startTime);
+  print(postTime);
+  print(storyController.endTime);
+  if (storyController.startTime.compareTo(postTime) <= 0 &&
+      storyController.endTime.compareTo(postTime) >= 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 checkstryId(List stryids, id, campaignId, customerId) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String userAccId = prefs.getString('user_acc_id')!;
   // String customerId = prefs.getString('customer_id');
   cid = customerId;
 
@@ -126,7 +139,6 @@ checkstryId(List stryids, id, campaignId, customerId) async {
 
   print('customer id is === $customerId');
   print('cameign id $campaignId');
-  print('the user_acc_id ${userAccId.toString()}');
   print('the id is $id');
   print('the stryId $stryids');
 
@@ -196,7 +208,8 @@ Future<String?> addStory(String url) async {
   }
 }
 
-class _BrandStoriesState extends State<BrandStories> {
+class _BrandStoriesState extends State<BrandStories>
+    with WidgetsBindingObserver {
   static StoryController storyController = Get.find();
 
   int count = 0;
@@ -306,6 +319,7 @@ class _BrandStoriesState extends State<BrandStories> {
     print(widget.id);
     print(widget.campaignId);
     print('................${widget.id}');
+    WidgetsBinding.instance!.addObserver(this);
     _postsController = StreamController();
     loadPosts(widget.id);
     getUserData();
@@ -325,11 +339,35 @@ class _BrandStoriesState extends State<BrandStories> {
     super.initState();
   }
 
-  // @override
-  // void dispose() {
-  //   _controller.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("\nResumed\n");
+        storyController.isAppOpen = true;
+        break;
+      case AppLifecycleState.inactive:
+        print("\nInactive\n");
+        storyController.isAppOpen = false;
+        break;
+      case AppLifecycleState.detached:
+        storyController.isAppOpen = false;
+        print("\nDetached\n");
+        break;
+      case AppLifecycleState.paused:
+        storyController.isAppOpen = false;
+        print("\nPaused\n");
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -389,10 +427,9 @@ class _BrandStoriesState extends State<BrandStories> {
                         return AlertDialog(
                           title: Text(widget.brand),
                           content: Text(
-                            '${widget.brandMoto.toString()} \n Note: Add #nearlikes to your story',
+                            '${widget.brandMoto} \n Note: Add #nearlikes to your story',
                           ),
                           actions: [
-                            // Expanded(child: Text('Note: Add #nearlikes to your story',style: TextStyle(color: Colors.red,fontWeight: FontWeight.bold),)),
                             ElevatedButton(
                               child: const Text('Cancel'),
                               onPressed: () {
@@ -407,133 +444,269 @@ class _BrandStoriesState extends State<BrandStories> {
                                 });
                                 print(
                                     "Ok pressed --> ${storyController.storyUrl}");
+                                storyController.startTime = DateTime.now();
+                                print(
+                                    "Start Time --> ${storyController.startTime}");
+                                storyController.isAppOpen = false;
                                 String? response =
                                     await addStory(storyController.storyUrl);
                                 print('the response is $response');
+                                await Future.delayed(
+                                    const Duration(seconds: 5));
+                                Navigator.pop(context);
+                                while (!storyController.isAppOpen) {
+                                  await Future.delayed(
+                                      const Duration(seconds: 2), () async {});
+                                  print("Not in App");
+                                }
+
+                                print("Here");
+
+                                Get.dialog(const LoadingDialog());
+                                await Future.delayed(
+                                    const Duration(seconds: 5));
+                                Get.back();
+
+                                Get.dialog(const LoadingDialog.withText(
+                                    'It is might take some time'));
+                                await Future.delayed(
+                                    const Duration(seconds: 10));
+                                Get.back();
+
+                                Get.dialog(const LoadingDialog.withText(
+                                    'Server is taking longer than expected'));
+
                                 if (response == 'success') {
                                   // setState(() {
                                   //   loading1=false;
                                   // });
                                   //setState(() {loading=true;});
+                                  String moto =
+                                      widget.brandMoto.split(' ').last;
                                   _mockCheckForSession(mediaType).then(
-                                    (value) {
-                                      return showDialog(
-                                        context: _scaffoldKey.currentContext!,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: const Text(
-                                                'Checking your Story'),
-                                            content: const Text(
-                                                'Have you posted Instagram Story?'),
-                                            actions: <Widget>[
-                                              ElevatedButton(
-                                                child: const Text('No'),
-                                                onPressed: () {
-                                                  print('//b hello //b');
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
-                                              ElevatedButton(
-                                                child: const Text('Yes'),
-                                                onPressed: () async {
-                                                  setState(() {
-                                                    loading1 = true;
-                                                  });
+                                    (value) async {
+                                      setState(() {
+                                        loading1 = true;
+                                      });
 
-                                                  var response =
-                                                      await checkstry(
-                                                          instaPgId!);
-                                                  if (response == 'error') {
-                                                    storyController.error =
-                                                        'Post Story and Try Again';
-                                                    setState(() {
-                                                      loading1 = false;
-                                                    });
-                                                    Navigator.pop(context);
-                                                  } else {
-                                                    for (var i = 0;
-                                                        i <
-                                                            _getStory!
-                                                                .data!.length;
-                                                        i++) {
-                                                      try {
-                                                        RegExp exp = RegExp(
-                                                          caption,
-                                                          caseSensitive: false,
-                                                        );
-                                                        bool containe = exp
-                                                            .hasMatch(_getStory!
-                                                                .data![i]
-                                                                .caption!);
-                                                        print('in...');
-                                                        if (containe == true) {
-                                                          storyId.add(_getStory!
-                                                              .data![i].id!);
-                                                          // checkstryId(stry_id.toSet().toList(growable: true),widget.campaign_id);
-                                                        } else {
-                                                          setState(() {
-                                                            loading1 = false;
-                                                          });
-                                                          //Navigator.pop(context);
-                                                        }
-                                                      } catch (e) {
-                                                        // setState((){error='';});
-                                                        setState(() {
-                                                          loading1 = false;
-                                                        });
-                                                        //Navigator.pop(context);
-                                                      }
-                                                      // if(_getStry.data[i].caption==caption){
-                                                      //   String id=_getStry.data[i].id;
-                                                      //   print(id.toString());
-                                                      //   Navigator.pop(context);
-                                                      //   Navigator.push(context, MaterialPageRoute(
-                                                      //       builder: (context) => ScratchCards()));
-                                                      //
-                                                      // }
-                                                      // else setState(() {error='Post Story with given Instruction';});
-                                                    }
-                                                  }
-                                                  var value = await checkstryId(
-                                                      storyId.toSet().toList(
-                                                          growable: true),
-                                                      widget.id,
-                                                      widget.campaignId,
-                                                      customerId);
-                                                  if (value == 200) {
-                                                    print('in dialog');
-                                                    setState(() {
-                                                      loading1 = false;
-                                                    });
-                                                    Navigator.pop(context);
-                                                    Navigator.pop(context);
-                                                    Navigator.pop(context);
+                                      var response =
+                                          await checkstry(instaPgId!);
+                                      if (response == 'error') {
+                                        storyController.error =
+                                            'Post Story and Try Again';
+                                        setState(() {
+                                          loading1 = false;
+                                        });
+                                        if (Get.isDialogOpen!) {
+                                          Get.back();
+                                        }
+                                        Navigator.pop(context);
+                                      } else {
+                                        RegExp exp = RegExp(
+                                          caption,
+                                          caseSensitive: false,
+                                        );
+                                        for (Datum data in _getStory!.data!) {
+                                          try {
+                                            if (isValidStoryTime(data)) {
+                                              print("Time matched");
+                                              bool match =
+                                                  exp.hasMatch(data.caption!);
+                                              print('in...');
+                                              if (match == true) {
+                                                storyId.add(data.id!);
+                                              } else {
+                                                setState(() {
+                                                  loading1 = false;
+                                                });
+                                                //Navigator.pop(context);
+                                              }
+                                            } else {
+                                              print("Time not matched");
+                                            }
+                                          } catch (e) {
+                                            // setState((){error='';});
+                                            setState(() {
+                                              loading1 = false;
+                                            });
+                                            //Navigator.pop(context);
+                                          }
+                                        }
+                                        Get.back();
+                                      }
 
-                                                    //Navigator.push(context, MaterialPageRoute(builder: (context) =>ScratchCards(phoneNumber:phonenumber  ,)));
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ScratchCards(
-                                                          cID: cid!,
-                                                        ),
-                                                      ),
-                                                    );
-                                                    //return goToDialog();
-                                                  } else {
-                                                    storyController.error =
-                                                        'Please Add Proper Story';
-                                                    setState(() {
-                                                      loading1 = false;
-                                                    });
-                                                    // Navigator.pop(context);
-                                                  }
-                                                },
+                                      if (storyId.isEmpty) {
+                                        Get.dialog(AlertDialog(
+                                          title: const Text('No Story posted'),
+                                          content: Text(
+                                              'No story has been posted by you with $moto or the story might have not been uploaded yet. Delete the story and try again.'),
+                                          actions: [
+                                            ElevatedButton(
+                                              child: const Text('Ok'),
+                                              onPressed: () {
+                                                Get.back();
+                                              },
+                                            ),
+                                          ],
+                                        ));
+                                      } else {
+                                        var value = await checkstryId(
+                                            storyId
+                                                .toSet()
+                                                .toList(growable: true),
+                                            widget.id,
+                                            widget.campaignId,
+                                            customerId);
+                                        if (value == 200) {
+                                          print('in dialog');
+                                          setState(() {
+                                            loading1 = false;
+                                          });
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ScratchCards(
+                                                cID: cid!,
                                               ),
-                                            ],
+                                            ),
                                           );
-                                        },
-                                      );
+                                        } else {
+                                          storyController.error =
+                                              'Please Add Proper Story';
+                                          setState(() {
+                                            loading1 = false;
+                                          });
+                                          // Navigator.pop(context);
+                                        }
+                                      }
+                                      // return showDialog(
+                                      //   context: _scaffoldKey.currentContext!,
+                                      //   builder: (context) {
+                                      //     return AlertDialog(
+                                      //       title: const Text(
+                                      //           'Checking your Story'),
+                                      //       content: const Text(
+                                      //           'Have you posted Instagram Story?'),
+                                      //       actions: <Widget>[
+                                      //         ElevatedButton(
+                                      //           child: const Text('No'),
+                                      //           onPressed: () {
+                                      //             Navigator.pop(context);
+                                      //           },
+                                      //         ),
+                                      //         ElevatedButton(
+                                      //           child: const Text('Yes'),
+                                      //           onPressed: () async {
+                                      //             setState(() {
+                                      //               loading1 = true;
+                                      //             });
+
+                                      //             var response =
+                                      //                 await checkstry(
+                                      //                     instaPgId!);
+                                      //             if (response == 'error') {
+                                      //               storyController.error =
+                                      //                   'Post Story and Try Again';
+                                      //               setState(() {
+                                      //                 loading1 = false;
+                                      //               });
+                                      //               Navigator.pop(context);
+                                      //             } else {
+                                      //               RegExp exp = RegExp(
+                                      //                 widget.brandMoto
+                                      //                     .split(' ')
+                                      //                     .last,
+                                      //                 caseSensitive: false,
+                                      //               );
+                                      //               print(
+                                      //                   "Moto --> ${widget.brandMoto.split(' ').last}");
+                                      //               print(exp.toString());
+                                      //               for (Datum data
+                                      //                   in _getStory!.data!) {
+                                      //                 try {
+                                      //                   if (isValidStoryTime(
+                                      //                       data)) {
+                                      //                     print("Time matched");
+                                      //                     bool match =
+                                      //                         exp.hasMatch(data
+                                      //                             .caption!);
+                                      //                     print('in...');
+                                      //                     if (match == true) {
+                                      //                       storyId
+                                      //                           .add(data.id!);
+                                      //                       // checkstryId(stry_id.toSet().toList(growable: true),widget.campaign_id);
+                                      //                     } else {
+                                      //                       setState(() {
+                                      //                         loading1 = false;
+                                      //                       });
+                                      //                       //Navigator.pop(context);
+                                      //                     }
+                                      //                   } else {
+                                      //                     print(
+                                      //                         "Time not matched");
+                                      //                   }
+                                      //                 } catch (e) {
+                                      //                   // setState((){error='';});
+                                      //                   setState(() {
+                                      //                     loading1 = false;
+                                      //                   });
+                                      //                   //Navigator.pop(context);
+                                      //                 }
+                                      //                 // if(_getStry.data[i].caption==caption){
+                                      //                 //   String id=_getStry.data[i].id;
+                                      //                 //   print(id.toString());
+                                      //                 //   Navigator.pop(context);
+                                      //                 //   Navigator.push(context, MaterialPageRoute(
+                                      //                 //       builder: (context) => ScratchCards()));
+                                      //                 //
+                                      //                 // }
+                                      //                 // else setState(() {error='Post Story with given Instruction';});
+                                      //               }
+                                      //             }
+                                      //             var value = await checkstryId(
+                                      //                 storyId.toSet().toList(
+                                      //                     growable: true),
+                                      //                 widget.id,
+                                      //                 widget.campaignId,
+                                      //                 customerId);
+                                      //             if (value == 200) {
+                                      //               print('in dialog');
+                                      //               setState(() {
+                                      //                 loading1 = false;
+                                      //               });
+                                      //               Navigator.pop(context);
+                                      //               Navigator.pop(context);
+                                      //               Navigator.pop(context);
+
+                                      //               //Navigator.push(context, MaterialPageRoute(builder: (context) =>ScratchCards(phoneNumber:phonenumber  ,)));
+                                      //               Navigator.push(
+                                      //                 context,
+                                      //                 MaterialPageRoute(
+                                      //                   builder: (context) =>
+                                      //                       ScratchCards(
+                                      //                     cID: cid!,
+                                      //                   ),
+                                      //                 ),
+                                      //               );
+                                      //               //return goToDialog();
+                                      //             } else {
+                                      //               storyController.error =
+                                      //                   'Please Add Proper Story';
+                                      //               setState(() {
+                                      //                 loading1 = false;
+                                      //               });
+                                      //               // Navigator.pop(context);
+                                      //             }
+                                      //           },
+                                      //         ),
+                                      //       ],
+                                      //     );
+                                      //   },
+                                      // );
                                     },
                                   );
                                 }

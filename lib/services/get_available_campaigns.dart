@@ -7,19 +7,23 @@ import 'package:nearlikes/models/get_campaigns.dart';
 
 Future<GetCampaigns?> getAvailableCampaigns(
     {int? followers, String? location, int? age}) async {
-  print("data..");
+  late GetCampaigns? _getCampaigns;
+
   const String apiUrl = "https://nearlikes.com/v1/api/campaign/get/campaigns";
-  var body = {"followers": followers, "location": "kolkata", "age": age};
-  final response = await http.post(
+  final Map<String, dynamic> body = {
+    "followers": followers,
+    "location": "kolkata",
+    "age": age
+  };
+  final http.Response response = await http.post(
     Uri.parse(apiUrl),
     headers: {"Content-Type": "application/json"},
     body: json.encode(body),
   );
+  print("statusCode --> ${response.statusCode}");
+  final String responseString = response.body;
 
-  print("data");
-  print(response.statusCode);
-  final String responseString = response.body.toString();
-
-  print(responseString);
-  return getCampaignsFromJson(responseString);
+  print("Response --> $responseString");
+  _getCampaigns = getCampaignsFromJson(responseString);
+  return _getCampaigns;
 }

@@ -1,10 +1,18 @@
 import 'package:get/get.dart';
 
 class StoryController extends GetxController {
-  RxBool _isStorySelected = false.obs;
-  RxInt _selectedIndex = 0.obs;
-  RxString _storyUrl = ''.obs;
-  RxString _error = ''.obs;
+  final RxBool _isStorySelected = false.obs;
+  final RxInt _selectedIndex = 0.obs;
+  final RxString _storyUrl = ''.obs;
+  final RxString _error = ''.obs;
+  final RxBool _isAppOpen = true.obs;
+
+  late DateTime startTime;
+  late DateTime endTime;
+
+  bool get isAppOpen => _isAppOpen.value;
+
+  set isAppOpen(bool value) => _isAppOpen.value = value;
 
   int get selectedIndex => _selectedIndex.value;
 

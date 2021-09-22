@@ -11,18 +11,9 @@ import 'models/get_campaigns.dart';
 import 'services/services.dart';
 
 class SelectBrand extends StatelessWidget {
-  final String? id; //owner id
-  final String? brand;
-  final String? campaignId;
   final bool showBackButton;
 
-  const SelectBrand(
-      {Key? key,
-      this.id,
-      this.brand,
-      this.campaignId,
-      this.showBackButton = false})
-      : super(key: key);
+  const SelectBrand({Key? key, this.showBackButton = false}) : super(key: key);
 
   static GetCampaigns? _getCampaigns;
 
@@ -76,11 +67,9 @@ class SelectBrand extends StatelessWidget {
                 ),
                 builder: (context, AsyncSnapshot snapshot) {
                   if (!snapshot.hasData) {
-                    print(snapshot.data);
                     return const Center(child: CircularProgressIndicator());
                   }
-                  print("Data recieved");
-                  print(snapshot.data);
+                  print(_getCampaigns?.campaigns!);
                   return GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -91,7 +80,7 @@ class SelectBrand extends StatelessWidget {
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 20,
                     ),
-                    itemCount: _getCampaigns?.campaigns!.length,
+                    itemCount: _getCampaigns?.campaigns!.length ?? 0,
                     itemBuilder: (BuildContext ctx, index) {
                       return InkWell(
                         splashColor: Colors.transparent,
