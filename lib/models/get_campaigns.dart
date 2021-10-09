@@ -85,7 +85,8 @@
 // }
 import 'dart:convert';
 
-GetCampaigns getCampaignsFromJson(String str) => GetCampaigns.fromJson(json.decode(str));
+GetCampaigns getCampaignsFromJson(String str) =>
+    GetCampaigns.fromJson(json.decode(str));
 
 String getCampaignsToJson(GetCampaigns data) => json.encode(data.toJson());
 
@@ -97,12 +98,13 @@ class GetCampaigns {
   List<Campaign>? campaigns;
 
   factory GetCampaigns.fromJson(Map<String, dynamic> json) => GetCampaigns(
-    campaigns: List<Campaign>.from(json["campaigns"].map((x) => Campaign.fromJson(x))),
-  );
+        campaigns: List<Campaign>.from(
+            json["campaigns"].map((x) => Campaign.fromJson(x))),
+      );
 
   Map<String, dynamic> toJson() => {
-    "campaigns": List<dynamic>.from(campaigns!.map((x) => x.toJson())),
-  };
+        "campaigns": List<dynamic>.from(campaigns!.map((x) => x.toJson())),
+      };
 }
 
 class Campaign {
@@ -120,6 +122,7 @@ class Campaign {
     this.brand,
     this.text,
     this.v,
+    this.username,
   });
 
   String? id;
@@ -135,36 +138,39 @@ class Campaign {
   String? brand;
   String? text;
   int? v;
+  String? username;
 
   factory Campaign.fromJson(Map<String, dynamic> json) => Campaign(
-    id: json["_id"],
-    createdAt: json["createdAt"],
-    ownerId: json["ownerId"],
-    followers: json["followers"],
-    location: json["location"],
-    age: json["age"],
-    logo: json["logo"],
-    status: json["status"],
-    start: json["start"],
-    end: json["end"],
-    brand: json["brand"],
-    text: json["text"],
-    v: json["__v"],
-  );
+        id: json["_id"],
+        createdAt: json["createdAt"],
+        ownerId: json["ownerId"],
+        followers: json["followers"],
+        location: json["location"],
+        age: json["age"],
+        logo: json["logo"],
+        status: json["status"],
+        start: json["start"],
+        end: json["end"],
+        brand: json["brand"],
+        text: json["text"],
+        v: json["__v"],
+        username: json["username"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "_id": id,
-    "createdAt": createdAt,
-    "ownerId": ownerId,
-    "followers": followers,
-    "location": location,
-    "age": age,
-    "logo": logo,
-    "status": status,
-    "start": start,
-    "end": end,
-    "brand": brand,
-    "text": text,
-    "__v": v,
-  };
+        "_id": id,
+        "createdAt": createdAt,
+        "ownerId": ownerId,
+        "followers": followers,
+        "location": location,
+        "age": age,
+        "logo": logo,
+        "status": status,
+        "start": start,
+        "end": end,
+        "brand": brand,
+        "text": text,
+        "__v": v,
+        "username": username,
+      };
 }

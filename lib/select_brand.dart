@@ -97,6 +97,7 @@ class SelectBrand extends StatelessWidget {
                                   id: campaign.ownerId!,
                                   campaignId: campaign.id!,
                                   brandMoto: campaign.text!,
+                                  brandTag: campaign.username!,
                                 );
                               },
                             ),

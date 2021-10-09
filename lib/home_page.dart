@@ -185,7 +185,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> addPlayer(String? customerId) async {
     print('Inside AddPlayer');
-    //TODO: changed right side of line below
+
     final OSDeviceState? status = await OneSignal.shared.getDeviceState();
     final String osUserID = status!.userId!;
 
@@ -324,6 +324,7 @@ class _HomePageState extends State<HomePage> {
                                     id: campaign.ownerId!,
                                     campaignId: campaign.id!,
                                     brandMoto: campaign.text!,
+                                    brandTag: campaign.username!,
                                   );
                                 },
                               ),

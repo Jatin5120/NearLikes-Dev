@@ -13,16 +13,19 @@ class LoadingDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    return SizedBox(
-      height: size.height.tenPercent,
-      child: Dialog(
-        insetPadding: const EdgeInsets.all(20),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
+    return Dialog(
+      insetPadding: const EdgeInsets.all(20),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SizedBox(
+          height: size.height.tenPercent,
           child: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
+            child: Wrap(
+              direction: Axis.horizontal,
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              runSpacing: size.height.onePercent,
               children: [
                 const CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(kSecondaryColor),
@@ -31,8 +34,9 @@ class LoadingDialog extends StatelessWidget {
                 Text(
                   label,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                   ),
+                  softWrap: true,
                 ),
               ],
             ),

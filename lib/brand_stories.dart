@@ -45,6 +45,7 @@ class BrandStories extends StatefulWidget {
   final String brand;
   final String campaignId;
   final String brandMoto;
+  final String brandTag;
 
   const BrandStories({
     Key? key,
@@ -52,6 +53,7 @@ class BrandStories extends StatefulWidget {
     required this.brand,
     required this.campaignId,
     required this.brandMoto,
+    required this.brandTag,
   }) : super(key: key);
   @override
   _BrandStoriesState createState() => _BrandStoriesState();
@@ -214,7 +216,9 @@ class _BrandStoriesState extends State<BrandStories>
 
   int count = 0;
   var response;
-  String caption = '#nearlikes';
+
+  final String hashTag = '#nearlikes';
+  final String caption = "If you're interested then check the link in bio of ";
 
   int choice = -1;
   List<String> storyId = [];
@@ -306,7 +310,7 @@ class _BrandStoriesState extends State<BrandStories>
     var body = {"id": "$customerId"};
     var response = await http.post(Uri.parse(url),
         body: json.encode(body), headers: {"Content-Type": "application/json"});
-    print('jesus');
+
     print(response.body);
     print(response.statusCode);
     return response.statusCode;
@@ -426,8 +430,18 @@ class _BrandStoriesState extends State<BrandStories>
                       builder: (context) {
                         return AlertDialog(
                           title: Text(widget.brand),
-                          content: Text(
-                            '${widget.brandMoto} \n Note: Add #nearlikes to your story',
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                widget.brandMoto,
+                              ),
+                              SizedBox(height: size.height.twoPercent),
+                              Text(
+                                'Note: The statement will be copied to your clipboard. Be sure to paste the statement.',
+                                style: Get.textTheme.subtitle2,
+                              )
+                            ],
                           ),
                           actions: [
                             ElevatedButton(
@@ -442,18 +456,21 @@ class _BrandStoriesState extends State<BrandStories>
                                 setState(() {
                                   loading1 = true;
                                 });
-                                print(
-                                    "Ok pressed --> ${storyController.storyUrl}");
+                                final String statement =
+                                    caption + widget.brandTag;
+
+                                await SocialShare.copyToClipboard(statement);
+
                                 storyController.startTime = DateTime.now();
-                                print(
-                                    "Start Time --> ${storyController.startTime}");
                                 storyController.isAppOpen = false;
+
                                 String? response =
                                     await addStory(storyController.storyUrl);
+
                                 print('the response is $response');
-                                await Future.delayed(
-                                    const Duration(seconds: 5));
+
                                 Navigator.pop(context);
+
                                 while (!storyController.isAppOpen) {
                                   await Future.delayed(
                                       const Duration(seconds: 2), () async {});
@@ -462,27 +479,14 @@ class _BrandStoriesState extends State<BrandStories>
 
                                 print("Here");
 
-                                Get.dialog(const LoadingDialog());
-                                await Future.delayed(
-                                    const Duration(seconds: 5));
-                                Get.back();
-
-                                Get.dialog(const LoadingDialog.withText(
-                                    'It is might take some time'));
-                                await Future.delayed(
-                                    const Duration(seconds: 10));
-                                Get.back();
-
-                                Get.dialog(const LoadingDialog.withText(
-                                    'Server is taking longer than expected'));
+                                Get.dialog(
+                                  const LoadingDialog.withText(
+                                    'Please wait while we are validating',
+                                  ),
+                                  barrierDismissible: false,
+                                );
 
                                 if (response == 'success') {
-                                  // setState(() {
-                                  //   loading1=false;
-                                  // });
-                                  //setState(() {loading=true;});
-                                  String moto =
-                                      widget.brandMoto.split(' ').last;
                                   _mockCheckForSession(mediaType).then(
                                     (value) async {
                                       setState(() {
@@ -503,7 +507,7 @@ class _BrandStoriesState extends State<BrandStories>
                                         Navigator.pop(context);
                                       } else {
                                         RegExp exp = RegExp(
-                                          caption,
+                                          statement,
                                           caseSensitive: false,
                                         );
                                         for (Datum data in _getStory!.data!) {
@@ -539,7 +543,8 @@ class _BrandStoriesState extends State<BrandStories>
                                         Get.dialog(AlertDialog(
                                           title: const Text('No Story posted'),
                                           content: Text(
-                                              'No story has been posted by you with $moto or the story might have not been uploaded yet. Delete the story and try again.'),
+                                            'No story has been posted by you with ${widget.brandTag} or the story might have not been uploaded yet. Delete the story and try again.',
+                                          ),
                                           actions: [
                                             ElevatedButton(
                                               child: const Text('Ok'),
@@ -583,130 +588,6 @@ class _BrandStoriesState extends State<BrandStories>
                                           // Navigator.pop(context);
                                         }
                                       }
-                                      // return showDialog(
-                                      //   context: _scaffoldKey.currentContext!,
-                                      //   builder: (context) {
-                                      //     return AlertDialog(
-                                      //       title: const Text(
-                                      //           'Checking your Story'),
-                                      //       content: const Text(
-                                      //           'Have you posted Instagram Story?'),
-                                      //       actions: <Widget>[
-                                      //         ElevatedButton(
-                                      //           child: const Text('No'),
-                                      //           onPressed: () {
-                                      //             Navigator.pop(context);
-                                      //           },
-                                      //         ),
-                                      //         ElevatedButton(
-                                      //           child: const Text('Yes'),
-                                      //           onPressed: () async {
-                                      //             setState(() {
-                                      //               loading1 = true;
-                                      //             });
-
-                                      //             var response =
-                                      //                 await checkstry(
-                                      //                     instaPgId!);
-                                      //             if (response == 'error') {
-                                      //               storyController.error =
-                                      //                   'Post Story and Try Again';
-                                      //               setState(() {
-                                      //                 loading1 = false;
-                                      //               });
-                                      //               Navigator.pop(context);
-                                      //             } else {
-                                      //               RegExp exp = RegExp(
-                                      //                 widget.brandMoto
-                                      //                     .split(' ')
-                                      //                     .last,
-                                      //                 caseSensitive: false,
-                                      //               );
-                                      //               print(
-                                      //                   "Moto --> ${widget.brandMoto.split(' ').last}");
-                                      //               print(exp.toString());
-                                      //               for (Datum data
-                                      //                   in _getStory!.data!) {
-                                      //                 try {
-                                      //                   if (isValidStoryTime(
-                                      //                       data)) {
-                                      //                     print("Time matched");
-                                      //                     bool match =
-                                      //                         exp.hasMatch(data
-                                      //                             .caption!);
-                                      //                     print('in...');
-                                      //                     if (match == true) {
-                                      //                       storyId
-                                      //                           .add(data.id!);
-                                      //                       // checkstryId(stry_id.toSet().toList(growable: true),widget.campaign_id);
-                                      //                     } else {
-                                      //                       setState(() {
-                                      //                         loading1 = false;
-                                      //                       });
-                                      //                       //Navigator.pop(context);
-                                      //                     }
-                                      //                   } else {
-                                      //                     print(
-                                      //                         "Time not matched");
-                                      //                   }
-                                      //                 } catch (e) {
-                                      //                   // setState((){error='';});
-                                      //                   setState(() {
-                                      //                     loading1 = false;
-                                      //                   });
-                                      //                   //Navigator.pop(context);
-                                      //                 }
-                                      //                 // if(_getStry.data[i].caption==caption){
-                                      //                 //   String id=_getStry.data[i].id;
-                                      //                 //   print(id.toString());
-                                      //                 //   Navigator.pop(context);
-                                      //                 //   Navigator.push(context, MaterialPageRoute(
-                                      //                 //       builder: (context) => ScratchCards()));
-                                      //                 //
-                                      //                 // }
-                                      //                 // else setState(() {error='Post Story with given Instruction';});
-                                      //               }
-                                      //             }
-                                      //             var value = await checkstryId(
-                                      //                 storyId.toSet().toList(
-                                      //                     growable: true),
-                                      //                 widget.id,
-                                      //                 widget.campaignId,
-                                      //                 customerId);
-                                      //             if (value == 200) {
-                                      //               print('in dialog');
-                                      //               setState(() {
-                                      //                 loading1 = false;
-                                      //               });
-                                      //               Navigator.pop(context);
-                                      //               Navigator.pop(context);
-                                      //               Navigator.pop(context);
-
-                                      //               //Navigator.push(context, MaterialPageRoute(builder: (context) =>ScratchCards(phoneNumber:phonenumber  ,)));
-                                      //               Navigator.push(
-                                      //                 context,
-                                      //                 MaterialPageRoute(
-                                      //                   builder: (context) =>
-                                      //                       ScratchCards(
-                                      //                     cID: cid!,
-                                      //                   ),
-                                      //                 ),
-                                      //               );
-                                      //               //return goToDialog();
-                                      //             } else {
-                                      //               storyController.error =
-                                      //                   'Please Add Proper Story';
-                                      //               setState(() {
-                                      //                 loading1 = false;
-                                      //               });
-                                      //               // Navigator.pop(context);
-                                      //             }
-                                      //           },
-                                      //         ),
-                                      //       ],
-                                      //     );
-                                      //   },
-                                      // );
                                     },
                                   );
                                 }
