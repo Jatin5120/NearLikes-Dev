@@ -351,7 +351,7 @@ class _HomePageState extends State<HomePage> {
                                       gradient: LinearGradient(
                                         colors: [
                                           Colors.transparent,
-                                          kOverlayColor,
+                                          kDarkGrey,
                                         ],
                                         begin: Alignment.topCenter,
                                         end: Alignment.bottomCenter,
@@ -374,6 +374,7 @@ class _HomePageState extends State<HomePage> {
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w500,
                                                 color: Colors.white),
+                                            textAlign: TextAlign.center,
                                           ),
                                           // Text(
                                           //   "${_getCampaigns.campaigns[index].text}",

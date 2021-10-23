@@ -4,7 +4,6 @@ class StoryController extends GetxController {
   final RxBool _isStorySelected = false.obs;
   final RxInt _selectedIndex = 0.obs;
   final RxString _storyUrl = ''.obs;
-  final RxString _error = ''.obs;
   final RxBool _isAppOpen = true.obs;
 
   late DateTime startTime;
@@ -17,10 +16,6 @@ class StoryController extends GetxController {
   int get selectedIndex => _selectedIndex.value;
 
   set selectedIndex(int selectedIndex) => _selectedIndex.value = selectedIndex;
-
-  String get error => _error.value;
-
-  set error(String error) => _error.value = error;
 
   String get storyUrl => _storyUrl.value;
 

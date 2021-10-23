@@ -34,7 +34,6 @@ String? customerId;
 String? phonenumber;
 String? instaPgId;
 String? cid;
-bool loading1 = false;
 bool videoinit = false;
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -288,17 +287,9 @@ class _BrandStoriesState extends State<BrandStories>
 
   Future<bool> _mockCheckForSession(mediaType) async {
     if (mediaType == 'image') {
-      await Future.delayed(const Duration(milliseconds: 8000), () {
-        setState(() {
-          loading1 = false;
-        });
-      });
+      await Future.delayed(const Duration(milliseconds: 8000), () {});
     } else {
-      await Future.delayed(const Duration(milliseconds: 15000), () {
-        setState(() {
-          loading1 = false;
-        });
-      });
+      await Future.delayed(const Duration(milliseconds: 15000), () {});
     }
     return true;
   }
@@ -373,6 +364,20 @@ class _BrandStoriesState extends State<BrandStories>
     super.dispose();
   }
 
+  void showAlertdialog({required String title, required String content}) {
+    Get.dialog(AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: [
+        ElevatedButton(
+          child: const Text('Ok'),
+          onPressed: () => Get.back(),
+          style: ElevatedButton.styleFrom(primary: kSecondaryColor),
+        ),
+      ],
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -406,20 +411,10 @@ class _BrandStoriesState extends State<BrandStories>
                       colors: [kSecondaryColor, kPrimaryColor],
                     )
                   : null,
-              // color: selected == "" ? Colors.grey : null,
-              // gradient: selected != ""
-              //     ? const LinearGradient(
-              //         begin: Alignment.topRight,
-              //         end: Alignment.bottomLeft,
-              //         colors: [kSecondaryColor, kPrimaryColor],
-              //       )
-              //     : null,
             ),
             child: InkWell(
               onTap: () async {
                 if (storyController.isStorySelected) {
-                  storyController.error = '';
-
                   int statusCode = await checkMaxStry();
 
                   print('the maxstry is $statusCode');
@@ -453,9 +448,6 @@ class _BrandStoriesState extends State<BrandStories>
                             ElevatedButton(
                               child: const Text('Ok'),
                               onPressed: () async {
-                                setState(() {
-                                  loading1 = true;
-                                });
                                 final String statement =
                                     caption + widget.brandTag;
 
@@ -471,11 +463,22 @@ class _BrandStoriesState extends State<BrandStories>
 
                                 Navigator.pop(context);
 
+                                Get.dialog(
+                                  const LoadingDialog.withText(
+                                    'Waiting for you to come back',
+                                  ),
+                                  barrierDismissible: false,
+                                );
+
                                 while (!storyController.isAppOpen) {
                                   await Future.delayed(
-                                      const Duration(seconds: 2), () async {});
+                                    const Duration(seconds: 2),
+                                    () async {},
+                                  );
                                   print("Not in App");
                                 }
+
+                                Get.back();
 
                                 print("Here");
 
@@ -489,18 +492,14 @@ class _BrandStoriesState extends State<BrandStories>
                                 if (response == 'success') {
                                   _mockCheckForSession(mediaType).then(
                                     (value) async {
-                                      setState(() {
-                                        loading1 = true;
-                                      });
-
                                       var response =
                                           await checkstry(instaPgId!);
                                       if (response == 'error') {
-                                        storyController.error =
-                                            'Post Story and Try Again';
-                                        setState(() {
-                                          loading1 = false;
-                                        });
+                                        showAlertdialog(
+                                          title: 'Error Occured',
+                                          content: 'Post story and try again',
+                                        );
+
                                         if (Get.isDialogOpen!) {
                                           Get.back();
                                         }
@@ -520,9 +519,6 @@ class _BrandStoriesState extends State<BrandStories>
                                               if (match == true) {
                                                 storyId.add(data.id!);
                                               } else {
-                                                setState(() {
-                                                  loading1 = false;
-                                                });
                                                 //Navigator.pop(context);
                                               }
                                             } else {
@@ -530,9 +526,7 @@ class _BrandStoriesState extends State<BrandStories>
                                             }
                                           } catch (e) {
                                             // setState((){error='';});
-                                            setState(() {
-                                              loading1 = false;
-                                            });
+
                                             //Navigator.pop(context);
                                           }
                                         }
@@ -540,20 +534,11 @@ class _BrandStoriesState extends State<BrandStories>
                                       }
 
                                       if (storyId.isEmpty) {
-                                        Get.dialog(AlertDialog(
-                                          title: const Text('No Story posted'),
-                                          content: Text(
-                                            'No story has been posted by you with ${widget.brandTag} or the story might have not been uploaded yet. Delete the story and try again.',
-                                          ),
-                                          actions: [
-                                            ElevatedButton(
-                                              child: const Text('Ok'),
-                                              onPressed: () {
-                                                Get.back();
-                                              },
-                                            ),
-                                          ],
-                                        ));
+                                        showAlertdialog(
+                                          title: 'No Story detected',
+                                          content:
+                                              'No story has been posted by you with ${widget.brandTag} or the story might have not been uploaded yet. Delete the story and try again.',
+                                        );
                                       } else {
                                         var value = await checkstryId(
                                             storyId
@@ -564,9 +549,7 @@ class _BrandStoriesState extends State<BrandStories>
                                             customerId);
                                         if (value == 200) {
                                           print('in dialog');
-                                          setState(() {
-                                            loading1 = false;
-                                          });
+
                                           Navigator.pop(context);
                                           Navigator.pop(context);
                                           Navigator.pop(context);
@@ -580,11 +563,10 @@ class _BrandStoriesState extends State<BrandStories>
                                             ),
                                           );
                                         } else {
-                                          storyController.error =
-                                              'Please Add Proper Story';
-                                          setState(() {
-                                            loading1 = false;
-                                          });
+                                          showAlertdialog(
+                                            title: 'Improper story',
+                                            content: "Please Add Proper Story",
+                                          );
                                           // Navigator.pop(context);
                                         }
                                       }
@@ -599,10 +581,11 @@ class _BrandStoriesState extends State<BrandStories>
                       },
                     );
                   } else {
-                    storyController.error = 'Max story limit per day is One';
-                    setState(() {
-                      loading1 = false;
-                    });
+                    showAlertdialog(
+                      title: 'Story limit',
+                      content:
+                          "Max Story limit per day is 1 and it looks like you've posted the story for the day. Please try next day",
+                    );
                   }
                 }
               },
@@ -624,6 +607,7 @@ class _BrandStoriesState extends State<BrandStories>
       body: Stack(
         children: [
           SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
             child: Padding(
               padding: const EdgeInsets.only(left: 0, right: 0, top: 70),
               child: Column(
@@ -733,81 +717,80 @@ class _BrandStoriesState extends State<BrandStories>
                                       itemCount: _getMedia!.media!.length,
                                       itemBuilder: (_, index) {
                                         return GestureDetector(
-                                            onTap: () {
-                                              storyController.error = '';
-                                              storyController.storyUrl =
-                                                  "${_getMedia!.media![index].src}";
-                                              storyController.isStorySelected =
-                                                  true;
-                                              storyController.selectedIndex =
-                                                  index;
+                                          onTap: () {
+                                            storyController.storyUrl =
+                                                "${_getMedia!.media![index].src}";
+                                            storyController.isStorySelected =
+                                                true;
+                                            storyController.selectedIndex =
+                                                index;
 
-                                              setState(() {
-                                                print(
-                                                    "Image OnTap --> ${_getMedia!.media![index].src}");
+                                            setState(() {
+                                              print(
+                                                  "Image OnTap --> ${_getMedia!.media![index].src}");
 
-                                                mediaType =
-                                                    "${_getMedia!.media![index].type}";
-                                                choice = index;
-                                              });
-                                            },
-                                            child: _getMedia!
-                                                        .media![index].type ==
-                                                    'image'
-                                                ? Container(
-                                                    margin: const EdgeInsets
-                                                        .fromLTRB(35, 0, 35, 0),
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.all(
-                                                        Radius.circular(10),
-                                                      ),
+                                              mediaType =
+                                                  "${_getMedia!.media![index].type}";
+                                              choice = index;
+                                            });
+                                          },
+                                          child: _getMedia!
+                                                      .media![index].type ==
+                                                  'image'
+                                              ? Container(
+                                                  margin:
+                                                      const EdgeInsets.fromLTRB(
+                                                          35, 0, 35, 0),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.all(
+                                                      Radius.circular(10),
                                                     ),
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            bottom: 5),
-                                                    alignment: Alignment.center,
-                                                    child: Obx(
-                                                      () => Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(8),
-                                                          border: Border.all(
-                                                            color: storyController
-                                                                        .isStorySelected &&
-                                                                    storyController
-                                                                            .selectedIndex ==
-                                                                        index
-                                                                ? kBlackColor
-                                                                : Colors
-                                                                    .transparent,
-                                                          ),
-                                                        ),
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8),
-                                                        child:
-                                                            CachedNetworkImage(
-                                                          imageUrl:
-                                                              "${_getMedia!.media![index].src}",
-                                                          progressIndicatorBuilder: (context,
-                                                                  url,
-                                                                  downloadProgress) =>
-                                                              CircularProgressIndicator(
-                                                                  value: downloadProgress
-                                                                      .progress),
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              const Icon(
-                                                                  Icons.error),
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 5),
+                                                  alignment: Alignment.center,
+                                                  child: Obx(
+                                                    () => Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        border: Border.all(
+                                                          color: storyController
+                                                                      .isStorySelected &&
+                                                                  storyController
+                                                                          .selectedIndex ==
+                                                                      index
+                                                              ? kBlackColor
+                                                              : Colors
+                                                                  .transparent,
                                                         ),
                                                       ),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8),
+                                                      child: CachedNetworkImage(
+                                                        imageUrl:
+                                                            "${_getMedia!.media![index].src}",
+                                                        progressIndicatorBuilder: (context,
+                                                                url,
+                                                                downloadProgress) =>
+                                                            CircularProgressIndicator(
+                                                                value: downloadProgress
+                                                                    .progress),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            const Icon(
+                                                                Icons.error),
+                                                      ),
                                                     ),
-                                                  )
-                                                : const SizedBox.shrink());
+                                                  ),
+                                                )
+                                              : const SizedBox.shrink(),
+                                        );
                                       },
                                     );
                                   },
@@ -831,7 +814,6 @@ class _BrandStoriesState extends State<BrandStories>
                                           onTap: () {
                                             storyController.storyUrl =
                                                 "${_getMedia!.media![index].src}";
-                                            storyController.error = '';
                                             setState(() {
                                               print(
                                                   "Video onTap --> ${_getMedia!.media![index].src}");
@@ -892,23 +874,6 @@ class _BrandStoriesState extends State<BrandStories>
               ),
             ),
           ),
-
-          Center(
-            child: Container(
-              // height: MediaQuery.of(context).size.height,
-              margin: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height - 100),
-              child: Obx(
-                () => Text(
-                  storyController.error,
-                  style: const TextStyle(
-                      fontSize: 17,
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ),
           // loading==true?FutureBuilder(
           //      future: checkstry(),
           //      builder: (context, AsyncSnapshot snapshot){
@@ -938,16 +903,6 @@ class _BrandStoriesState extends State<BrandStories>
           //        return Text('Error');
           //
           //      }):Container(height: 0,)
-
-          loading1 == true
-              ? Container(
-                  alignment: Alignment.bottomCenter,
-                  child: const CircularProgressIndicator(
-                    color: Colors.red,
-                  ),
-                  padding: const EdgeInsets.only(bottom: 30),
-                )
-              : Container(height: 0)
         ],
       ),
     );
@@ -964,12 +919,12 @@ class _BrandStoriesState extends State<BrandStories>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     successTicket(),
-                    SizedBox(
+                    const SizedBox(
                       height: 10.0,
                     ),
                     FloatingActionButton(
                       backgroundColor: Colors.black54,
-                      child: Icon(
+                      child: const Icon(
                         Icons.clear,
                         color: Colors.white,
                       ),
