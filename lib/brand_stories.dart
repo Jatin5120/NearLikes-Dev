@@ -708,7 +708,10 @@ class _BrandStoriesState extends State<BrandStories>
                                   builder: (context, AsyncSnapshot snapshot) {
                                     if (!snapshot.hasData) {
                                       return const Center(
-                                          child: CircularProgressIndicator());
+                                        child: CircularProgressIndicator(
+                                          color: kSecondaryColor,
+                                        ),
+                                      );
                                     }
 
                                     return ListView.builder(
@@ -802,7 +805,10 @@ class _BrandStoriesState extends State<BrandStories>
                                   builder: (context, AsyncSnapshot snapshot) {
                                     if (!snapshot.hasData) {
                                       return const Center(
-                                          child: CircularProgressIndicator());
+                                        child: CircularProgressIndicator(
+                                          color: kSecondaryColor,
+                                        ),
+                                      );
                                     }
 
                                     return ListView.builder(
